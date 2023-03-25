@@ -16,7 +16,7 @@ requirepass yourpassword # 在redis.conf中加入这个来确保连接需要密�
 appendonly no # 默认没有开启aof
 ```
 
-## RDB
+### RDB
 
 默认开启的持久化
 
@@ -33,5 +33,9 @@ save 60 10000 	# 60s内有10000个key被修改时保存
 daemonize no # 默认不是后台运行 改成yes改为后台运行
 ```
 
+### 远程连接
 
+```shell
+bind 127.0.0.1 # 默认是打开的，将其注释掉即可
+```
 
