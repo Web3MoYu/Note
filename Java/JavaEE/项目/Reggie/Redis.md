@@ -39,3 +39,17 @@ daemonize no # 默认不是后台运行 改成yes改为后台运行
 bind 127.0.0.1 # 默认是打开的，将其注释掉即可
 ```
 
+## 数据类型
+
+![](img/1.png)
+
+### string
+
+### hash
+
+### list
+
+### set
+
+### sorted set
+
