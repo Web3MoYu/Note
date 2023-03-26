@@ -6,6 +6,28 @@
 
 ### Failed to determine a suitable driver class
 
+最大的原因就是Springboot3不支持druid数据源，手动配置或才有下面的方法
+
+```java
+@Configuration
+public class DataSourceConfig {
+
+    @Resource
+    Environment env;
+
+    @Bean
+    public DataSource getDataSource() {
+        DruidDataSource druidDataSource = new DruidDataSource();
+        druidDataSource.setUrl(env.getProperty("spring.datasource.druid.url"));
+        druidDataSource.setUsername(env.getProperty("spring.datasource.druid.username"));
+        druidDataSource.setPassword(env.getProperty("spring.datasource.druid.password"));
+        return druidDataSource;
+    }
+}
+```
+
+
+
 在解决Property 'sqlSessionFactory' or 'sqlSessionTemplate' are required之后，如果使用druid或者其他的数据源的数据源会出现Failed to determine a suitable driver class的错误。正确写法如下
 
 ```yaml
@@ -27,6 +49,8 @@ spring:
       username: root
       password: root
 ```
+
+
 
 # 遇到的问题
 
