@@ -1,11 +1,62 @@
 # Docker
 
+### 配置仓库地址
+
+虽然每次安装docker之后都会进行修改仓库地址，但是每次修改之后都记不住在在哪里修改仓库地址，今天我还是来记录一下，省的以后找不到。
+
+步骤只有两步：1、修改配置文件。2、重启docker
+
+1、修改配置文件
+
+编辑配置文件，没有就创建一个
+
+```bash
+vim /etc/docker/daemon.json
+```
+
+文件内容如下：
+
+```json
+{
+  "registry-mirrors": [
+        "https://dockerhub.azk8s.cn",
+        "https://hub-mirror.c.163.com"
+    ]
+}
+```
+
+这里的仓库地址可以写多个
+
+2、重启docker
+
+```bash
+systemctl daemon-reload
+systemctl restart docker
+systemctl status docker
+```
+
+查看一下结果 
+
+```bash
+docker info
+```
+
+```bash
+ Registry Mirrors:
+  https://dockerhub.azk8s.cn/
+  https://hub-mirror.c.163.com/
+ Live Restore Enabled: false
+```
+
+
+
 ## （一）基础命令
 
 ```bash
 # 将当前用户添加到docker组中，可以使该用户不用sudo使用docker
 # 将lsh用户追加到docker组中
 sudo usermod -aG docker lsh
+# 或者gpasswd -a lsh docker
 
 # 重启docker服务
 sudo systemctl restart docker
@@ -240,12 +291,29 @@ docker tag app-user:1.0.0 app-user:alpha-1.0.0
 docker ps
 ```
 
+### 查看容器的详细信息
+
+- 包括CPU，内存
+
+```bash
+docker stats
+```
+
 ### **查看所有容器** 
 
 - 包含正在运行 和已停止的
 
 ```shell
 docker ps -a
+```
+
+### 将容器内部的文件拷贝到主机上
+
+- `docker cp <container>:<path> <host_path>`
+
+```bash
+# 例如，要将名为 myapp 的容器内部的/app/data文件拷贝到主机上的/data 目录，可以输入以下命令：
+docker cp myapp:/app/data /data
 ```
 
 **容器怎么来呢 可以通过run 镜像 来构建 自己的容器实例**
@@ -256,6 +324,8 @@ docker ps -a
 -it 表示与容器进行交互式启动 
 -d 表示可后台运行容器 （守护式运行）  
 --name 给要运行的容器起的名字  /bin/bash  交互路径
+-v <host_path>:<container_path> <image>：将主机的目录挂载到容器内部。
+-p <host_port>:<container_port> <image>：将容器的端口映射到主机的端口。
 docker run -it -d --name 要取的别名 镜像名:Tag /bin/bash 
 ```
 
@@ -503,51 +573,127 @@ docker rename 容器ID/容器名 新容器名
 
 ![](img/24.png)
 
-### 配置仓库地址
+## (四）自己提交一个镜像
 
-虽然每次安装docker之后都会进行修改仓库地址，但是每次修改之后都记不住在在哪里修改仓库地址，今天我还是来记录一下，省的以后找不到。
+我们运行的容器可能在镜像的基础上做了一些修改，有时候我们希望保存起来，封装成一个更新的镜像，这时候我们就需要使用 commit 命令来构建一个新的镜像
 
-步骤只有两步：1、修改配置文件。2、重启docker
+```shell
+docker commit -m="提交信息" -a="作者信息" 容器名/容器ID 提交后的镜像名:Tag
+```
 
-1、修改配置文件
+我们拉取一个tomcat镜像 并持久化运行 且设置与宿主机进行端口映射
 
-编辑配置文件，没有就创建一个
+```shell
+docker pull tomcat
+
+docker run -itd -p8080:8080 --name tom tomcat /bin/bash
+```
+
+访问 咱的端口 发现访问404 这是因为咱配置了阿里云镜像后 所拉取得镜像都是最基础班的 仅仅包含其容器必要数据 例如 容器中 vim vi ll 命令都没有
+
+![](img/25.png)
+
+![](img/26.png)
+
+咱们的webapps 下一个文件都没有 ，访问肯定404罗
+
+不断查看 发现咱 webapps.dist 下是有文件的 我们把它拷贝的webapps 下 然后打包成一个新的镜像 后 访问查看是否进入到首页 不进入404页面
+
+![](img/27.png)
+
+exit 退出容器
+
+使用 提交命令 将在运行的tomcat 容器 打包为一个全新的镜像 名字为tom Tag为1.0
+
+```
+docker commit -a="leilei" -m="第一次打包镜像，打包后直接访问还会404吗" 231f2eae6896 tom:1.0
+```
+
+![](img/28.png)
+
+为了区分 咱停止并删除之前tomcat 的容器
+
+![](img/29.png)
+
+接下来 运行咱自己打包的镜像 tom:1.0
+
+设置容器名字为lei 映射端口为6500:8080
+
+```shell
+docker run -d -it  -p6500:8080 --name lei tom:1.0 /bin/bash
+```
+
+![](img/30.png)
+
+![](img/31.png)
+
+访问6500 端口进入到了 tomcat 首页 说明 咱commit 镜像成功了
+
+## (五)docker 运维命令
+
+可能有时候发布会遇到如下错误:
+
+```
+docker: write /var/lib/docker/tmp/GetImageBlob325372670: no space left on device
+```
+
+这个错误是docker在写入的时候报错无机器无空间
+
+![](img/32.png)
+
+**查看docker工作目录**
+
+```shell
+sudo docker info | grep "Docker Root Dir"
+```
+
+![](img/33.png)
+
+### **查看docker磁盘占用总体情况**
+
+```shell
+du -hs /var/lib/docker/ 
+```
+
+### **查看Docker的磁盘使用具体情况**
+
+```shell
+docker system df
+```
+
+![](img/34.png)
+
+### **删除 无用的容器和 镜像**
 
 ```bash
-vim /etc/docker/daemon.json
+# 删除异常停止的容器
+docker rm `docker ps -a | grep Exited | awk '{print $1}'` 
+ 
+# 删除名称或标签为none的镜像
+docker rmi -f  `docker images | grep '<none>' | awk '{print $3}'`
 ```
 
-文件内容如下：
+### **清除所有无容器使用的镜像**
 
-```json
-{
-  "registry-mirrors": [
-        "https://dockerhub.azk8s.cn",
-        "https://hub-mirror.c.163.com"
-    ]
-}
-```
-
-这里的仓库地址可以写多个
-
-2、重启docker
+注意，此命令只要是镜像无容器使用（容器正常运行）都会被删除，包括容器临时停止
 
 ```bash
-systemctl daemon-reload
-systemctl restart docker
-systemctl status docker
+docker system prune -a
 ```
 
-查看一下结果 
+### **查找大文件**
 
 ```bash
-docker info
+find / -type f -size +100M -print0 | xargs -0 du -h | sort -nr
 ```
 
+### **查找指定docker使用目录下大于指定大小文件**
+
 ```bash
- Registry Mirrors:
-  https://dockerhub.azk8s.cn/
-  https://hub-mirror.c.163.com/
- Live Restore Enabled: false
+find / -type f -size +100M -print0 | xargs -0 du -h | sort -nr |grep '/var/lib/docker/overlay2/*'
 ```
+
+ex：我这里是查找 /var/lib/docker/overlay2/* 开头的且大于100m的文件
+
+![](img/35.png)
 

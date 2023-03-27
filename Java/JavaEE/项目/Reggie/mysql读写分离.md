@@ -11,7 +11,7 @@
 - 运行容器
 
   ```bash
-  docker run -d --name mysql -p 3307:3306 -e MYSQL_ROOT_PASSWORD=root mysql:8.0.28 --lower_case_table_names=1
+  docker run -d --name mysql -p 3307:3306 -v /path/:/var/lib/mysql/ -e MYSQL_ROOT_PASSWORD=root mysql:8.0.28 --lower_case_table_names=1
   ```
 
   ```
