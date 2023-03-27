@@ -6,7 +6,7 @@
 
 ### Failed to determine a suitable driver class
 
-最大的原因就是Springboot3不支持druid数据源，手动配置或才有下面的方法
+最大的原因就是Springboot3不支持druid数据源，手动配置或采用下面的方法
 
 ```java
 @Configuration
@@ -28,7 +28,7 @@ public class DataSourceConfig {
 
 
 
-在解决Property 'sqlSessionFactory' or 'sqlSessionTemplate' are required之后，如果使用druid或者其他的数据源的数据源会出现Failed to determine a suitable driver class的错误。正确写法如下
+在解决Property 'sqlSessionFactory' or 'sqlSessionTemplate' are required之后，如果使用druid会出现Failed to determine a suitable driver class的错误。正确写法如下
 
 ```yaml
 spring:
@@ -40,8 +40,7 @@ spring:
 ```
 
 ```yaml
-# 这样写在SpringBoot3中会出现Failed to determine a suitable driver class的错误，要使用
-# 上面那种方式
+# 这样写在SpringBoot3中会出现Failed to determine a suitable driver class的错误，要使用上面那种方式或者手动配置数据源
 spring:
     druid:
       url: jdbc:mysql://localhost:3306/frontreact

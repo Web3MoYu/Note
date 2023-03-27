@@ -299,6 +299,12 @@ docker ps
 docker stats
 ```
 
+### 查看容器ip
+
+```bash
+docker inspect --format='{{.NetworkSettings.IPAddress}}' mysql-master
+```
+
 ### **查看所有容器** 
 
 - 包含正在运行 和已停止的
@@ -307,14 +313,25 @@ docker stats
 docker ps -a
 ```
 
-### 将容器内部的文件拷贝到主机上
+### 文件拷贝
 
-- `docker cp <container>:<path> <host_path>`
+- 从实体机到docker
+- docker cp /路径/文件名 容器ID:/上传路径
 
 ```bash
-# 例如，要将名为 myapp 的容器内部的/app/data文件拷贝到主机上的/data 目录，可以输入以下命令：
-docker cp myapp:/app/data /data
+# 将1这个文件拷贝到docker的/usr/share目录下
+sudo docker cp 1 00e7d0f73704:/usr/share/
 ```
+
+- 从docker到实体机
+- docker cp 容器ID:/上传路径 /路径/文件名
+
+```bash
+# 将123.txt拷贝到实体机的/usr/share/目录下
+sudo docker cp 00e7d0f73704:/usr/local/arm/rootfs-debian/123.txt /usr/share/
+```
+
+
 
 **容器怎么来呢 可以通过run 镜像 来构建 自己的容器实例**
 
