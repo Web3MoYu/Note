@@ -373,6 +373,8 @@ helloworld
 - -eq 等于（equal） -ne不等于（notequal）
 - -lt 小于（lessthan） -le小于等于（lessequal）
 - -gt大于（greaterthan） -ge大于等于（greaterequal）
+- -n (如果字符串不为空，则为真)
+- -z (如果字符串为空，则为真)
 
 注：如果是字符串之间的比较 ，用等号“=”判断相等；用“!=”判断不等。
 
