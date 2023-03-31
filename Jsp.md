@@ -108,17 +108,15 @@
 <body>
     <div>
         <form action="" id="form">
-            id<input type="text" name="id">
+             书号<input type="number" name="isbn" id="isbn">
             </br>
-            书号<input type="text" name="isbn">
+            书名<input type="text" name="name" id="name">
             </br>
-            书名<input type="text" name="name">
+            作者<input type="text" name="author" id="author">
             </br>
-            作者<input type="text" name="author">
+            出版社<input type="text" name="press" id="press">
             </br>
-            出版社<input type="text" name="press">
-            </br>
-            价格<input type="text" name="price">
+            价格<input type="text" name="price" id="price">
             </br>
             submit<input type="submit" onclick="check()">
         </form>
@@ -314,6 +312,7 @@ switch (action){
 		getAllBooks(req,resp);
 		break;
 	case "BookDelAction":
+        DelBook(resp,resp);
 		break;
 	case "BookUpdateAction":
 		UpdateAction(req, resp);
@@ -481,9 +480,9 @@ private void DelBook(HttpServletRequest request, HttpServletResponse response) {
 		throw new RuntimeException(e);
 	}
 	if (count != 0) {
-		writer.println("1");
+		writer.print("1");
 	} else {
-		writer.println("0");
+		writer.print("0");
     }
 }
 ```
@@ -510,5 +509,48 @@ const delBook = (id) => {
 		}
 	})
 }
+```
+
+# DBConnection
+
+```java
+package com.example.server.common;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+/**
+ * Author: lsh
+ * Date: 2023/3/30 20:06
+ * Version: 1.0
+ */
+public class DBConnection {
+    private static Connection connection;
+
+    public static Connection getConnection(){
+        if (connection == null){
+           try{
+               Class.forName("com.mysql.jdbc.Driver");
+               connection = DriverManager.getConnection("jdbc://localhost:3306/test", "root", "root");
+           }catch (Exception e){
+               e.printStackTrace();
+           }
+        }
+        return connection;
+    }
+
+    public static void CloseConnection(){
+        if (connection != null){
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            connection = null;
+        }
+    }
+}
+
 ```
 
