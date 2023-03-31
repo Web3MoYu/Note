@@ -504,7 +504,6 @@ const delBook = (id) => {
 				alert("数据删除不成功");
 			} else {
 				alert("数据删除成功!");
-				getList();
 			}
 		}
 	})
