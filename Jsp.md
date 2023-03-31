@@ -531,7 +531,7 @@ public class DBConnection {
         if (connection == null){
            try{
                Class.forName("com.mysql.jdbc.Driver");
-               connection = DriverManager.getConnection("jdbc://localhost:3306/test", "root", "root");
+               connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "root");
            }catch (Exception e){
                e.printStackTrace();
            }
