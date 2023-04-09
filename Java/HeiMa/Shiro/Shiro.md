@@ -5731,7 +5731,7 @@ public class ShiroConfig {
      */
     @Bean("redisSessionDao")
     public SessionDAO redisSessionDao(){
-        RedisSessionDao sessionDAO =   new RedisSessionDao();
+        RedisSessionDao sessionDAO = new RedisSessionDao();
         sessionDAO.setGlobalSessionTimeout(shiroRedisProperties.getGlobalSessionTimeout());
         return sessionDAO;
     }

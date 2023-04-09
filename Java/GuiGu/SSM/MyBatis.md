@@ -204,8 +204,8 @@ public interface UserMapper {
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.atguigu.mybatis.mapper.UserMapper">
 	<!--int insertUser();-->
-	<nsert id="insertUser">
-		<insert into t_user values(null,'admin','123456',23,'男','12345@qq.com')
+	<insert id="insertUser">
+		insert into t_user values(null,'admin','123456',23,'男','12345@qq.com')
 	</insert>
 </mapper>
 ```

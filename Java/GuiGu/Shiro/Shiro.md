@@ -388,6 +388,25 @@ lisi=l4
 role1=user:insert,user:select
 ```
 
+#### 【1】认证相关
+
+| 过滤器 | 过滤器类                 | 说明                                                         | 默认 |
+| ------ | ------------------------ | ------------------------------------------------------------ | ---- |
+| authc  | FormAuthenticationFilter | 基于表单的过滤器；如“/**=authc”，如果没有登录会跳到相应的登录页面登录 | 无   |
+| logout | LogoutFilter             | 退出过滤器，主要属性：redirectUrl：退出成功后重定向的地址，如“/logout=logout” | /    |
+| anon   | AnonymousFilter          | 匿名过滤器，即不需要登录即可访问；一般用于静态资源过滤；示例“/static/**=anon” | 无   |
+| user   | UserFilter               | 用户过滤器，用户已经登录或者记住我都可以；示例"/**=user"     |      |
+
+#### 【2】授权相关
+
+| 过滤器 | 过滤器类                       | 说明                                                         | 默认 |
+| ------ | ------------------------------ | ------------------------------------------------------------ | ---- |
+| roles  | RolesAuthorizationFilter       | 角色授权拦截器，验证用户是否拥有所有角色；主要属性： loginUrl：登录页面地址（/login.jsp）；unauthorizedUrl：未授权后重定向的地址；示例“/admin/**=roles[admin]” | 无   |
+| perms  | PermissionsAuthorizationFilter | 权限授权拦截器，验证用户是否拥有所有权限；属性和roles一样；示例“/user/**=perms["user:create"]” | 无   |
+| port   | PortFilter                     | 端口拦截器，主要属性：port（80）：可以通过的端口；示例“/test= port[80]”，如果用户访问该页面是非80，将自动将请求端口改为80并重定向到该80端口，其他路径/参数等都一样 | 无   |
+| rest   | HttpMethodPermissionFilter     | rest风格拦截器，自动根据请求方法构建权限字符串（GET=read, POST=create,PUT=update,DELETE=delete,HEAD=read,TRACE=read,OPTIONS=read, MKCOL=create）构建权限字符串；示例“/users=rest[user]”，会自动拼出“user:read,user:create,user:update,user:delete”权限字符串进行权限匹配（所有都得匹配，isPermittedAll） | 无   |
+| ssl    | SslFilter                      | SSL拦截器，只有请求协议是https才能通过；否则自动跳转会https端口（443）；其他和port拦截器一样； | 无   |
+
 ## 第三章 与Spring Boot整合 
 
 ### 3.1 框架整合
@@ -865,7 +884,10 @@ public class ShiroConfig {
  		CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
  		cookieRememberMeManager.setCookie(rememberMeCookie());
  
-		cookieRememberMeManager.setCipherKey("1234567890987654".getBytes());
+		// 注意：cookieRememberMeManager.setCipherKey传入参数为长度16位的byte[]，
+        // 否则会报Unable to init cipher instance:无法初始化密码实例的错误
+        // cookieRememberMeManager.setCipherKey用来设置加密的Key,参数类型byte[],字节数组长度要求16
+        cookieRememberMeManager.setCipherKey("1234567890987654".getBytes());
  		return cookieRememberMeManager;
  	}
  	//配置 Shiro 内置过滤器拦截范围
@@ -911,7 +933,8 @@ public String userLogin(String name, String pwd,@RequestParam(defaultValue = "fa
 //登录认证验证 rememberMe
 @GetMapping("userLoginRm")
 public String userLogin(HttpSession session) {
- 	session.setAttribute("user","rememberMe");
+ 	Subject subject = SecurityUtils.getSubject();
+    session.setAttribute("user", subject.getPrincipal().toString());
  	return "main";
 }
 ```
@@ -1025,7 +1048,7 @@ public DefaultShiroFilterChainDefinition shiroFilterChainDefinition(){
 （3）@RequiresGuest 
 	验证是否是一个guest的请求，是否是游客的请求
 	此时subject.getPrincipal()为null
-（4）@RequiresRoles 
+（4）@RequiresRoles 参数里有logical用于控制逻辑或和逻辑与
 	验证subject是否有相应角色，有角色访问方法，没有则会抛出异常AuthorizationException。
 	例如：@RequiresRoles(“aRoleName”)
 	void someMethod();
@@ -1557,8 +1580,7 @@ public ShiroDialect shiroDialect(){
 public class TestEH {
  	public static void main(String[] args) {
  		//获取编译目录下的资源的流对象
- 		InputStream input = 
-		TestEH.class.getClassLoader().getResourceAsStream("ehcache.xml");
+ 		InputStream input = TestEH.class.getClassLoader().getResourceAsStream("ehcache.xml");
  		//获取 EhCache 的缓存管理对象
  		CacheManager cacheManager = new CacheManager(input);
  		//获取缓存对象
@@ -1576,7 +1598,7 @@ public class TestEH {
 
 **3、Shiro整合EhCache**
 
-Shiro官方提供了shiro-ehcache，实现了整合EhCache作为Shiro的缓存工具。可以缓 存认证执行的Realm方法，减少对数据库的访问，提高认证效率
+Shiro官方提供了shiro-ehcache，实现了整合EhCache作为Shiro的缓存工具。可以缓存认证执行的Realm方法，减少对数据库的访问，提高认证效率
 
 （1）添加依赖
 
@@ -1673,6 +1695,51 @@ public EhCacheManager getEhCacheManager(){
 先清除日志，再点击角色认证、权限认证，查看日志，没有查询数据库
 
 ![](img/46.png)
+
+#### SpringCache实现简易缓存
+
+添加依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+```
+
+
+
+只需要在Real调用的service方法中缓存相应的数据即可
+
+```java
+@Override
+// 缓存名称为role:,key为用户名，在返回值不为空的情况下进行缓存
+@Cacheable(value = "role:", key = "#username", unless = "#result == null ")
+public List<String> getUserRoleByName(String username) {
+    return mapper.getUserRoleInfoByName(username);
+}
+
+@Override
+// 缓存名称为permission:,key为相应的角色数组，在返回值不为空的情况下进行缓存
+@Cacheable(value = "permission:", key = "#roles.toArray()", unless = "#result == null")
+public List<String> getUserPermissionByRoles(List<String> roles) {
+    return mapper.getPermissionByRoles(roles);
+}
+
+@GetMapping("/login")
+// 在登出操作后，清除名称为role:和permission:下的所有缓存
+@CacheEvict(value = {"role:", "permission:"}, allEntries = true)
+public String login() {
+    return "login";
+}
+```
+
+
 
 ### 3.8 会话管理 
 

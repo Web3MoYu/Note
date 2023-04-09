@@ -470,10 +470,10 @@ fi
 [atguigu@hadoop 101 shells]$ vim if.sh
 #!/bin/bash
 
-if [ $ 1 - eq 1 ]
+if [ $1 - eq 1 ]
 then
 echo "banzhang zhen shuai"
-elif [ $ 1 - eq 2 ]
+elif [ $1 - eq 2 ]
 then
 echo "cls zhen mei"
 fi
@@ -515,7 +515,7 @@ esac
 [atguigu@hadoop 101 shells]$ vim case.sh
 
 #!/bin/bash
-case $ 1 in
+case $1 in
 " 1 ")
 echo "banzhang"
 ;;

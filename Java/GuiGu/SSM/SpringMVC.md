@@ -1611,6 +1611,49 @@ SpringMVC提供了自定义的异常处理器SimpleMappingExceptionResolver，�
 
 ## 12.2、基于注解的异常处理
 
+@ControllerAdvice注解的参数
+
+| 注解               | 描述                                                         |
+| ------------------ | ------------------------------------------------------------ |
+| basePackages       | 指定一个或多个包，这些包及其子包下的所有 Controller 都被该 @ControllerAdvice 管理。 |
+| basePackageClasses | 是 basePackages 的一种变形，指定一个或多个 Controller 类，这些类所属的包及其子包下的所有 Controller 都被该 @ControllerAdvice 管理。 |
+| assignableTypes    | 指定一个或多个 Controller 类，这些类被该 @ControllerAdvice 管理。 |
+| annotations        | 指定一个或多个注解，被这些注解所标记的 Controller 会被该 @ControllerAdvice 管理。 |
+
+### 举例
+
+- basePackages指定一个或多个包，这些包及其子包下的所有 Controller 都被该 @ControllerAdvice 管理。其中上面两种等价于 basePackages。
+
+  ```java
+  //@ControllerAdvice("cn.myz.demo.controller")
+  //@ControllerAdvice(value = "cn.myz.demo.controller")
+  @ControllerAdvice(basePackages = {"cn.myz.demo.controller"})
+  public class GlobalExceptionHandler {}
+  ```
+
+- basePackageClasses：是 basePackages 的一种变形，指定一个或多个 Controller 类，这些类所属的包及其子包下的所有 Controller 都被该 @ControllerAdvice 管理。
+
+  ```java
+  @ControllerAdvice(basePackageClasses = {MyController1.class})
+  public class GlobalExceptionHandler {}
+  ```
+
+- assignableTypes：指定一个或多个 Controller 类，这些类被该 @ControllerAdvice 管理。
+
+  ```java
+  @ControllerAdvice(assignableTypes = {MyController1.class})
+  public class GlobalExceptionHandler {}
+  ```
+
+- annotations：指定一个或多个注解，被这些注解所标记的 Controller 会被该 @ControllerAdvice 管理。
+
+  ```java
+  @ControllerAdvice(annotations = {RestController.class})
+  public class GlobalExceptionHandler {}
+  ```
+
+  
+
 ```java
 //@ControllerAdvice将当前类标识为异常处理的组件
 @ControllerAdvice

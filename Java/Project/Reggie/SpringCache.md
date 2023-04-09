@@ -31,10 +31,12 @@ CacheManager是Spring提供的各种缓存技术抽象接口。
 
 - 将方法的返回值放入缓存
 
-| 参数  | 说明                                                         |
-| ----- | ------------------------------------------------------------ |
-| value | 缓存的名称，每个缓存名称下可以有多个key,可以简单的理解为一个分类 |
-| key   | 缓存的key，支持Spring表达式                                  |
+| 参数      | 说明                                                         |
+| --------- | ------------------------------------------------------------ |
+| value     | 缓存的名称，每个缓存名称下可以有多个key,可以简单的理解为一个分类 |
+| key       | 缓存的key，支持Spring表达式                                  |
+| condition | 只有满足表达式时才缓存数据，这个虽然也支持Spring表达式，但是没有result |
+| unless    | 满足表达式时不缓存数据，这个有result                         |
 
 ```java
 /*
@@ -52,13 +54,14 @@ public User save(User user) {
 
 ## @CacheEvict
 
-- 将一条或多条数据从缓存中删除
+- 将一条或多条数据从缓存中删除，清除的是指定value下的
 
-| 参数          | 说明                                                         |
-| ------------- | ------------------------------------------------------------ |
-| value         | 缓存的名称，每个缓存名称下可以有多个key,可以简单的理解为一个分类 |
-| key           | 缓存的key，支持Spring表达式                                  |
-| allallEntries | 清空所有的缓存，默认关闭                                     |
+| 参数             | 说明                                                         |
+| ---------------- | ------------------------------------------------------------ |
+| value            | 缓存的名称，每个缓存名称下可以有多个key,可以简单的理解为一个分类 |
+| key              | 缓存的key，支持Spring表达式                                  |
+| allallEntries    | 清空所有的缓存，默认关闭                                     |
+| beforeInvocation | 是否在方法执行前就清空，默认为 false                         |
 
 ```java
 /*
@@ -85,7 +88,7 @@ public void delete(@PathVariable Long id) {
 
 ```java
 @GetMapping("/{id}")
-@Cacheable(value = "userCache", key = "#id", condition = "#result != null")
+@Cacheable(value = "userCache", key = "#id", unless = "#result == null")
 public User getById(@PathVariable Long id) {
 	return userService.getById(id);
 }
@@ -114,4 +117,4 @@ public List<User> list(User user) {
 </dependency>
 ```
 
-只需要导入依赖包即可，其他找上进行
+只需要导入依赖包即可，其他照上进行
