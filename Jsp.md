@@ -550,6 +550,74 @@ public class DBConnection {
         }
     }
 }
-
 ```
+
+# JQuery发请求
+
+````html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+    <script src="./js/jquery-1.11.3.min.js"></script>
+</head>
+
+<body>
+    <form id="fromTest" action="./submit" method="post">
+        <input type="text" id="username" name="username">
+        <br />
+        <input type="password" id="password" name="password">
+    </form>
+    <button onclick="test()">点击发送请求</button>
+    <br />
+    <button onclick="test2()">点击提交表单数据</button>
+</body>
+<script>
+    const test = () => {
+        $.post(
+            "./post/",
+            $("#fromTest").serialize(),
+            function (e) {
+                console.log(e);
+            }
+        );
+        $.get(
+            "./get/",
+            $("#fromTest").serialize(),
+            function (e) {
+                console.log(e);
+            }
+        );
+        $.ajax({
+            url: "./ajaxPost/",
+            type: "POST",
+            data: {
+                id: 1,
+                from: $("#fromTest").serialize()
+            },
+            async: false,
+            success: (data) => {
+                console.log(data);
+            },
+            error: (error) => {
+                console.log(error);
+                console.log("error");
+            }
+
+        })
+    }
+
+
+    const test2 = () => {
+        // 省略验证
+        $("#fromTest").submit();
+    }
+</script>
+
+</html>
+````
 
