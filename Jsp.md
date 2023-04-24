@@ -85,9 +85,7 @@
         strHtml += "</tr>"
     }
     $("#booklist").append(strHtml)
-    console.log(strHtml)
 </script>
-
 </html>
 ```
 
@@ -172,7 +170,6 @@
             alert("请输入数字形式的价格")
             return
         }
-
     }
 </script>
 
@@ -184,13 +181,6 @@
 1.实现图书信息值bean的所有getter和setter方法
 
 ```java
-package com.example.server.entity;
-
-/**
- * Author: lsh
- * Date: 2023/3/30 19:37
- * Version: 1.0
- */
 public class BookInfo {
     private int id;
     private String isbn;
@@ -247,7 +237,6 @@ public class BookInfo {
         this.price = price;
     }
 }
-
 ```
 
 2.实现业务Bean中修改图书信息的方法，只需要修改书名，作者，出版社，单价
@@ -273,31 +262,6 @@ public class BookInfo {
 
 3.实现Servlet中修改图书信息的方法
 
-
-
-```java
-public int UpdateBook(BookInfo book) {
-    Connection connection = DBConnection.getConnection();
-    int count = 0;
-    try {
-        PreparedStatement statement = connection.prepareStatement("update T_BOOK set BOOKNAME = ?,AUTHOR = ?, PRESS = ?, PRICE = ? where BOOKID = ?");
-        statement.setString(1, book.getName());
-        statement.setString(2, book.getAuthor());
-        statement.setString(3, book.getPress());
-        statement.setFloat(4, book.getPrice());
-        statement.setInt(5, book.getId());
-        count = statement.executeUpdate();
-        connection.close();
-        statement.close();
-    } catch (SQLException e) {
-        throw new RuntimeException(e);
-    }
-    return count;
-}
-```
-
-
-
 ```java
 @Override
 protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -322,21 +286,39 @@ switch (action){
 private void UpdateAction(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	BookDB bookDB = new BookDB();
 	BookInfo bookInfo = new BookInfo();
+    
 	bookInfo.setId(Integer.parseInt(request.getParameter("id")));
 	bookInfo.setIsbn(request.getParameter("isbn"));
 	bookInfo.setAuthor(request.getParameter("author"));
 	bookInfo.setName(request.getParameter("name"));
 	bookInfo.setPress(request.getParameter("press"));
 	bookInfo.setPrice(Float.parseFloat(request.getParameter("price")));
+    
 	int count = bookDB.UpdateBook(bookInfo);
 	PrintWriter out = response.getWriter();
 	if (count != 0) {
-	out.print("1");
+		out.print("1");
 	} else {
-	out.print("0");
+		out.print("0");
 	}
 	out.close();
 }
+ public int UpdateBook(BookInfo book) {
+	Connection connection = DBConnection.getConnection();
+	int count = 0;
+	try {
+		PreparedStatement statement = connection.prepareStatement("update T_BOOK set BOOKNAME = ?,AUTHOR = ?, PRESS = ?, PRICE = ? where BOOKID = ?");
+		statement.setString(1, book.getName());
+        statement.setString(2, book.getAuthor());
+        statement.setString(3, book.getPress());
+        statement.setFloat(4, book.getPrice());
+        statement.setInt(5, book.getId());
+        count = statement.executeUpdate();
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
+    }
+     return count;
+ }
 ```
 
 # Ajax应用
@@ -380,9 +362,9 @@ private void getAllBooks(HttpServletRequest request, HttpServletResponse respons
 	ArrayList<BookInfo> list = bookDB.GetAllBooks();
 	String str = "";
 	for (BookInfo book : list) {
-	str += "{ \"id\":" + book.getId() + ",\"isbn\":\"" + book.getIsbn() + "\",\"author\":\"" + book.getAuthor();
-	str += "\",\"name\":\"" + book.getName() + "\",\"press\":" + book.getPress() + "\",\"price\"" + book.getPrice();
-	str += "\"},";
+		str += "{ \"id\":" + book.getId() + ",\"isbn\":\"" + book.getIsbn() + "\",\"author\":\"" + book.getAuthor();
+		str += "\",\"name\":\"" + book.getName() + "\",\"press\":" + book.getPress() + "\",\"price\"" + book.getPrice();
+		str += "\"},";
 	}
 	str = str.substring(0, str.length() - 1);
 	response.getWriter().println("[" + str + "]");
@@ -487,8 +469,6 @@ private void DelBook(HttpServletRequest request, HttpServletResponse response) {
 }
 ```
 
-
-
 2.客户端采用$.ajax的Ajax代码，实现图书信息的删除处理
 
 ```javascript
@@ -547,7 +527,6 @@ public class DBConnection {
                 System.out.println("关闭con对象失败！");
             }
     }
-
 }
 ```
 
@@ -606,7 +585,6 @@ public class DBConnection {
                 console.log(error);
                 console.log("error");
             }
-
         })
     }
 
@@ -636,7 +614,7 @@ public class UserDB {
             pStmt = connection.prepareStatement("select * from t_user where VC_LOGIN_NAME = ?");
             pStmt.setString(1, userName);
             rs = pStmt.executeQuery();
-            while (rs.next()) {
+            if (rs.next()) {
                 user = new User();
                 user.setUserId(rs.getInt("N_USER_ID"));
                 user.setUsername(rs.getString("VC_LOGIN_NAME"));
