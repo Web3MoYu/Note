@@ -1473,3 +1473,15 @@ public class Course {
 </html>
 ```
 
+## Boolean类型的getter和setter
+
+```java
+public boolean male;//性別
+public void setMale(boolean male) {
+    this.male = male;
+}
+public boolean isMale() {
+    return this.male;
+}
+```
+
