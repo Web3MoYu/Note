@@ -946,8 +946,6 @@ public class MapperTest {
 }
 ~~~~
 
-
-
 ###### 核心代码实现
 
 创建一个类实现UserDetailsService接口，重写其中的方法。更加用户名从数据库中查询用户信息
@@ -970,6 +968,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userMapper.selectOne(wrapper);
         //如果查询不到数据就通过抛出异常来给出提示
         if(Objects.isNull(user)){
+            // 这里如果使用自定义异常可以被捕获到，但密码错误时捕获不到, 为保证一致性不使用自定义异常
             throw new RuntimeException("用户名或密码错误");
         }
         //TODO 根据用户查询权限信息 添加到LoginUser中
@@ -979,6 +978,48 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 }
 ~~~~
+
+```java
+@Service
+public class UserServiceImpl extends ServiceImpl<UserMapper, User>
+        implements UserService {
+
+   private static final Integer JWT_EXPIRE_TIME = 7;
+
+    @Resource
+    private AuthenticationManager authenticationManager;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Override
+    public R<Map<String, Object>> login(User user) {
+        //AuthenticationManager authenticate进行用户认证
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
+
+        // 登录失败会捕获异常信息，但是如果在这里捕获异常信息那么会导致后面无法通过
+        Authentication authenticate = authenticationManager.authenticate(authenticationToken);
+        if (Objects.isNull(authenticate)) {
+            throw new BizException("用户名或密码错误");
+        }
+
+        //如果认证通过了，使用userid生成一个jwt jwt存入ResponseResult返回
+        LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
+        String userId = loginUser.getUser().getId().toString();
+        String token = JWTUtils.creatTokenV1(userId, JWT_EXPIRE_TIME);
+
+        //把完整的用户信息存入redis userid作为key
+        redisTemplate.opsForValue().set("login:" + userId, loginUser, JWT_EXPIRE_TIME, TimeUnit.DAYS);
+        Map<String, Object> map = new HashMap<>();
+        map.put("token", token);
+        return R.ok("登录成功", map);
+    }
+}
+
+
+```
+
+
 
 因为UserDetailsService方法的返回值是UserDetails类型，所以需要定义一个类，实现该接口，把用户信息封装在其中。
 
@@ -1090,6 +1131,8 @@ public class LoginController {
 
 ~~~~
 
+**旧版Security**
+
 ~~~~java
 /**
  * @Author 三更  B站： https://space.bilibili.com/663528522
@@ -1117,7 +1160,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated();
     }
-
+    
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -1126,7 +1169,45 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ~~~~
 
-​	
+**新版Security**
+
+```java
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * 认证管理器，登录的时候参数会传给 authenticationManager
+     */
+    @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationConfiguration configuration) throws Exception {
+        return http
+                //关闭csrf
+                .csrf().disable()
+                //不通过Session获取SecurityContext
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                // 对于登录接口 允许匿名访问
+                .antMatchers("/user/login").anonymous()
+                // 除上面外的所有请求全部需要鉴权认证
+                .anyRequest().authenticated()
+                .and().build();
+    }
+}
+
+```
+
+**旧版本**
 
 ~~~~java
 @Service
@@ -1140,6 +1221,7 @@ public class LoginServiceImpl implements LoginServcie {
     @Override
     public ResponseResult login(User user) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUserName(),user.getPassword());
+        
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
         if(Objects.isNull(authenticate)){
             throw new RuntimeException("用户名或密码错误");
@@ -1156,8 +1238,46 @@ public class LoginServiceImpl implements LoginServcie {
         return new ResponseResult(200,"登陆成功",map);
     }
 }
-
 ~~~~
+
+**新版本** 这里如果捕获异常信息会导致无法使用Security的异常处理器处理异常信息
+
+```java
+@Service
+public class UserServiceImpl extends ServiceImpl<UserMapper, User>
+        implements UserService {
+
+    private static final Integer JWT_EXPIRE_TIME = 7;
+
+    @Resource
+    private AuthenticationManager authenticationManager;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Override
+    public R<Map<String, Object>> login(User user) {
+        //AuthenticationManager authenticate进行用户认证
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
+        // 登录失败会捕获异常信息
+        try {
+            Authentication authenticate = authenticationManager.authenticate(authenticationToken);
+            //如果认证通过了，使用userid生成一个jwt jwt存入ResponseResult返回
+            LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
+            String userId = loginUser.getUser().getId().toString();
+            String token = JWTUtils.creatTokenV1(userId, JWT_EXPIRE_TIME);
+            //把完整的用户信息存入redis userid作为key
+            Map<String, Object> map = new HashMap<>();
+            map.put("token", token);
+            redisTemplate.opsForValue().set("login:" + userId, loginUser, JWT_EXPIRE_TIME, TimeUnit.DAYS);
+            return R.ok("登录成功", map);
+        } catch (Exception e) {
+            throw new RuntimeException("用户名密码错误");
+        }
+
+    }
+}
+```
 
 
 
@@ -1175,86 +1295,74 @@ public class LoginServiceImpl implements LoginServcie {
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private RedisCache redisCache;
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        //获取token
-        String token = request.getHeader("token");
-        if (!StringUtils.hasText(token)) {
-            //放行
-            filterChain.doFilter(request, response);
-            return;
-        }
-        //解析token
-        String userid;
         try {
-            Claims claims = JwtUtil.parseJWT(token);
-            userid = claims.getSubject();
+            // 获取token
+            String token = request.getHeader("token");
+
+            if (StringUtils.isBlank(token)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            // 解析token
+            DecodedJWT decodedJWT = JWTUtils.parseJwtV1(token);
+            String userId = decodedJWT.getSubject();
+            // 从redis获取用户信息
+            LoginUser user = (LoginUser) redisTemplate.opsForValue().get("login:" + userId);
+            if (Objects.isNull(user)) {
+                throw new RuntimeException("token错误");
+            }
+            // 存入SecurityContextHolder
+            // TODO 获取权限信息封装到authentication
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(user, null, null);
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            filterChain.doFilter(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("token非法");
+            throw new RuntimeException("token错误");
         }
-        //从redis中获取用户信息
-        String redisKey = "login:" + userid;
-        LoginUser loginUser = redisCache.getCacheObject(redisKey);
-        if(Objects.isNull(loginUser)){
-            throw new RuntimeException("用户未登录");
-        }
-        //存入SecurityContextHolder
-        //TODO 获取权限信息封装到Authentication中
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginUser,null,null);
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        //放行
-        filterChain.doFilter(request, response);
     }
 }
 ~~~~
 
 ~~~~java
-/**
- * @Author 三更  B站： https://space.bilibili.com/663528522
- */
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
+    @Resource
+    private JwtAuthenticationTokenFilter tokenFilter;
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-
-    @Autowired
-    JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                //关闭csrf
-                .csrf().disable()
-                //不通过Session获取SecurityContext
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                // 对于登录接口 允许匿名访问
-                .antMatchers("/user/login").anonymous()
-                // 除上面外的所有请求全部需要鉴权认证
-                .anyRequest().authenticated();
-
-        //把token校验过滤器添加到过滤器链中
-        http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+    /**
+     * 认证管理器，登录的时候参数会传给 authenticationManager
+     */
+    @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationConfiguration configuration) throws Exception {
+        return http
+                .csrf().disable() //关闭csrf
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) //不通过Session获取SecurityContext
+                .and()
+                .authorizeRequests()
+                .antMatchers("/user/login").anonymous()        // 对于登录接口 允许匿名访问
+                .anyRequest().authenticated()   // 除上面外的所有请求全部需要鉴权认证
+                .and()
+                .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class) // 添加jwt过滤器
+                .build();
     }
 }
-
 ~~~~
 
 
@@ -1816,9 +1924,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        ResponseResult result = new ResponseResult(HttpStatus.FORBIDDEN.value(), "权限不足");
-        String json = JSON.toJSONString(result);
-        WebUtils.renderString(response,json);
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+        String json = JSON.toJSONString(R.error(HttpServletResponse.SC_FORBIDDEN, accessDeniedException.getMessage(), "权限不足"));
+        response.getWriter().print(json);
 
     }
 }
@@ -1833,9 +1943,11 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        ResponseResult result = new ResponseResult(HttpStatus.UNAUTHORIZED.value(), "认证失败请重新登录");
-        String json = JSON.toJSONString(result);
-        WebUtils.renderString(response,json);
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+        String json = JSON.toJSONString(R.error(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage(), "身份认证失败"));
+        response.getWriter().print(json);
     }
 }
 
