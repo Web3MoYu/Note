@@ -460,9 +460,10 @@ docker run -itd --name redis002 -p 8888:6379 redis:5.0.5 /bin/bash
 
 ```bash
 docker exec -it 容器名/容器ID /bin/bash
-
-#进入 前面的 redis001容器   
+# 进入 前面的 redis001容器   
 docker exec -it redis001 /bin/bash
+# 以root身份进入
+docker exec -u root -it redis001 /bin/bash
 ```
 
 ![](img/22.png)

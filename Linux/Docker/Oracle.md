@@ -27,7 +27,6 @@ docker run -d  \
 -e ORACLE_PWD=root \
 -e ORACLE_EDITION=standard \
 -e ORACLE_CHARACTERSET=AL32UTF8 \
--e ROOT_PASSWORD=root \
 -v /home/lsh/mydata/oracle/oradata:/opt/oracle/oradata \
 --name orcl19c_01 \
 registry.cn-hangzhou.aliyuncs.com/zhuyijun/oracle:19c
@@ -46,8 +45,6 @@ docker run -d  \
 -e ORACLE_EDITION=standard \
 # 字符集
 -e ORACLE_CHARACTERSET=AL32UTF8 \
-# 指定root密码
-e ROOT_PASSWORD=root
 # 文件保存路径
 -v /home/lsh/mydata/oracle/oradata:/opt/oracle/oradata \
 # 名字
@@ -75,9 +72,9 @@ docker rm orcl19c_01
 
 - **连接**
 
-```
+```shell
 docker exec -it orcl19c_01 /bin/bash
-
+docker exec -u root -it orcl19c_01 /bin/bash # 以root身份进入
 sqlplus / as sysdba
 
 show pdbs;
