@@ -1,5 +1,12 @@
 # Docker
 
+## 将当前用户添加到docker组中
+
+````shell
+sudo usermod -aG docker lsh # 添加组
+sudo systemctl restart docker # 重启docker服务
+````
+
 ### 配置仓库地址
 
 虽然每次安装docker之后都会进行修改仓库地址，但是每次修改之后都记不住在在哪里修改仓库地址，今天我还是来记录一下，省的以后找不到。
