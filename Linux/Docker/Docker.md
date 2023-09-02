@@ -340,9 +340,11 @@ sudo docker cp 00e7d0f73704:/usr/local/arm/rootfs-debian/123.txt /usr/share/
 ```shell
 -it 表示与容器进行交互式启动 
 -d 表示可后台运行容器 （守护式运行）  
+
 --name 给要运行的容器起的名字  /bin/bash  交互路径
 -v <host_path>:<container_path> <image>：将主机的目录挂载到容器内部。
 -p <host_port>:<container_port> <image>：将容器的端口映射到主机的端口。
+-e ROOT_PASSWORD=root ：指定容器root密码
 docker run -it -d --name 要取的别名 镜像名:Tag /bin/bash 
 ```
 
