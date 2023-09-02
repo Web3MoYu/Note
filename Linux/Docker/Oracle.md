@@ -1,4 +1,4 @@
-# Docker安装Oracler
+# Docker安装Oracle
 
 - **下载镜像**
 
@@ -17,7 +17,7 @@ mkdir -p /home/lsh/mydata/oracle/oradata
 chmod 777 /home/lsh/mydata/oracle/oradata
 ```
 
-- 安装
+- **启动容器**
 
 ```shell
 docker run -d  \
@@ -54,7 +54,7 @@ registry.cn-hangzhou.aliyuncs.com/zhuyijun/oracle:19c
 
 
 
-- **查看是否安装成功**
+- **查看是否启动成功**
 
 ```
 # 查看启动日志
