@@ -236,6 +236,17 @@ rabbitmqctl list_user
 
 ```sh
 # 安装启动 rabbitmq 容器
-docker run -d --name myRabbitMQ -e RABBITMQ_DEFAULT_USER=用户名 -e RABBITMQ_DEFAULT_PASS=密码 -p 15672:15672 -p 5672:5672 rabbitmq:3.8.14-management
+docker run -d --name myRabbitMQ -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=123456 -p 15672:15672 -p 5672:5672 rabbitmq:3.8.14-management
 ```
 
+## RabbitMQ各个端口的用法
+
+| 5672  | AMQP协议的默认端口，用于非加密连接 |
+| ----- | ---------------------------------- |
+| 5671  | AMQPS协议的默认端口，用于加密连接  |
+| 15672 | RabbitMQ管理插件的WebUI端口        |
+| 61613 | STOMP协议的WebSocket端口           |
+| 61614 | STOMP协议的WebSocket SSL端口       |
+| 1883  | MQTT协议的默认端口                 |
+
+需要注意的是，RabbitMQ的默认端口是5672，但从安全角度考虑，最好使用5671，通过SSL/TLS加密连接来保证通信安全。
