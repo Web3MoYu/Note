@@ -424,3 +424,16 @@ git pull 远程仓库
 
 ![点击查看源网页](https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic4.zhimg.com%2Fv2-054d8ff6135b3638aca543eff7424f98_1200x500.jpg&refer=http%3A%2F%2Fpic4.zhimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1644402012&t=79c30b8002d088850e33bd90492419b2)
 
+## 网络连接失败的解决方案
+
+- 如果遇到Failed to connect to github.com port 443 after 21097 ms: Couldn't connect to server失败可以尝试以下解决方案k
+
+````bash
+# 1.取消代理服务器, 现在设置检查本地网络有没有使用代理
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+# 2.先开启魔法然后检查使用的是哪个端口，然后给git使用代理服务器
+git config --global https.proxy http://127.0.0.1:7890
+git config --global http.proxy http://127.0.0.1:7890
+````
+
