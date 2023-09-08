@@ -250,3 +250,39 @@ docker run -d --name myRabbitMQ -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAU
 | 1883  | MQTT协议的默认端口                 |
 
 需要注意的是，RabbitMQ的默认端口是5672，但从安全角度考虑，最好使用5671，通过SSL/TLS加密连接来保证通信安全。
+
+## 解决图形化界面中OverView中没有图像化介绍
+
+ **1、查看所有容器（看id）**
+````bash
+docker ps -a
+````
+
+ **2、进入容器内部**
+````bash
+docker exec -it 容器id /bin/bash
+````
+
+**3、进入指定目录**
+
+```bash
+cd /etc/rabbitmq/conf.d/
+```
+
+**4、修改 management_agent.disable_metrics_collector = false**
+
+```bash
+echo management_agent.disable_metrics_collector = false > management_agent.disable_metrics_collector.conf
+```
+
+**5、退出容器**
+
+````bash
+exit
+````
+
+**6、重启容器**
+
+```bash
+docker restart 容器Id
+```
