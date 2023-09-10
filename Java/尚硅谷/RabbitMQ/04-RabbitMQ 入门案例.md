@@ -1,6 +1,6 @@
 # RabbitMQ 入门案例
 
-## Hello RabbitMQ
+## Hello RabbitMQ(one)
 
 用 Java 编写两个程序。发送单个消息的生产者和接收消息并打印出来的消费者
 
@@ -231,7 +231,7 @@ Hello,world
 channel.basicConsume(队列名字/String, 是否自动签收/boolean, 消费时的回调/接口类, 无法消费的回调/接口类);
 ```
 
-## Work Queues
+## Work Queues(two)
 
 Work Queues 是工作队列（又称任务队列）的主要思想是避免立即执行资源密集型任务，而不得不等待它完成。相反我们安排任务在之后执行。我们把任务封装为消息并将其发送到队列。在后台运行的工作进程将弹出任务并最终执行作业。当有多个工作线程时，这些工作线程将一起处理这些任务。
 

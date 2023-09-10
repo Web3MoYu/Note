@@ -1,6 +1,6 @@
 # RabbitMQ 消息应答与发布
 
-## 消息应答
+## 消息应答（three)
 
 消费者完成一个任务可能需要一段时间，如果其中一个消费者处理一个长的任务并仅只完成了部分突然它挂掉了，会发生什么情况。RabbitMQ 一旦向消费者传递了一条消息，便立即将该消息标记为删除。在这种情况下，突然有个消费者挂掉了，我们将丢失正在处理的消息。以及后续发送给该消费者的消息，因为它无法接收到。
 
@@ -132,52 +132,75 @@ channel.basicConsume(TASK_QUEUE_NAME, autoAck, deliverCallback, cancelCallback);
 
 ```java {27,36}
 /**
- * @author frx
- * @version 1.0
- * @date 2022/7/24  12:29
- * desc:消息在手动应答是不丢失、放回队列中重新消费
+ * 消费在手动应答时不丢失，放回队列中重新消费
  */
-public class Work03 {
+public class Worker03 {
 
-    //队列名称
-    public static final String TASK_QUEUE_NAME = "ACK_QUEUE";
+    public static final String TASK_QUEUE_NAME = "ask_queue";
 
-    //接受消息
     public static void main(String[] args) throws IOException, TimeoutException {
-        Channel channel = RabbitMQUtils.getChannel();
+        Channel channel = RabbitUtils.getChannel();
         System.out.println("C1等待接受消息处理时间较短");
 
-        DeliverCallback deliverCallback =(consumerTag,message) ->{
+        // 设置不公平分发 为1的时候则会采用能者多劳的方式
+        // int prefetchCount = 1;
+        // 设置预取值
+        int prefetchCount = 2;
+        channel.basicQos(prefetchCount);
 
-            //沉睡1S
+        // 采用手动应答
+        channel.basicConsume(TASK_QUEUE_NAME, false, ((consumerTag, message) -> {
+
+            System.out.println("C1接受到的消息:" + new String(message.getBody()));
+            // 沉睡1s
             SleepUtils.sleep(1);
-            System.out.println("接受到的消息:"+new String(message.getBody(),"UTF-8"));
-            //手动应答
-            /**
-             * 1.消息的标记Tag
-             * 2.是否批量应答 false表示不批量应答信道中的消息
+            // 手动应答
+            /*
+             * 1.消息的标记
+             * 2.是否批量应答
              */
-            channel.basicAck(message.getEnvelope().getDeliveryTag(),false);
-
-        };
-
-        CancelCallback cancelCallback = (consumerTag -> {
-            System.out.println(consumerTag + "消费者取消消费接口回调逻辑");
-
+            channel.basicAck(message.getEnvelope().getDeliveryTag(), false);
+            System.out.println("C1消息处理完毕" + new String(message.getBody()));
+        }), consumerTag -> {
+            System.out.println("消息取消的回调");
         });
-        //采用手动应答
-        boolean autoAck = false;
-        channel.basicConsume(TASK_QUEUE_NAME,autoAck,deliverCallback,cancelCallback);
     }
 }
 ```
 
 **消费者 2：**
 
-将 20 行代码的睡眠时间改为 10 秒：
-
 ```java
-SleepUtils.sleep(10);
+public class Worker04 {
+    public static final String TASK_QUEUE_NAME = "ask_queue";
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        Channel channel = RabbitUtils.getChannel();
+        System.out.println("C2等待接受消息处理时间较长");
+
+        // 设置不公平分发 为1的时候则会采用能者多劳的方式
+        // int prefetchCount = 1;
+        // 设置预取值
+        int prefetchCount = 5;
+        channel.basicQos(prefetchCount);
+        // 采用手动应答
+        channel.basicConsume(TASK_QUEUE_NAME, false, ((consumerTag, message) -> {
+
+            System.out.println("C2接受到的消息:" + new String(message.getBody()));
+            // 沉睡30s
+            SleepUtils.sleep(30);
+            // 手动应答
+            /*
+             * 1.消息的标记
+             * 2.是否批量应答
+             */
+            channel.basicAck(message.getEnvelope().getDeliveryTag(), false);
+            System.out.println("C2消息处理完毕:" + new String(message.getBody()));
+        }), consumerTag -> {
+            System.out.println("消息取消的回调");
+        });
+    }
+}
 ```
 
 ### 效果演示
@@ -192,7 +215,7 @@ SleepUtils.sleep(10);
 
 ![image](https://cdn.staticaly.com/gh/xustudyxu/image-hosting1@master/20220724/image.7418cd7x0u80.webp)
 
-## RabbitMQ持久化
+## RabbitMQ持久化(three)
 
 当 RabbitMQ 服务停掉以后，消息生产者发送过来的消息不丢失要如何保障？默认情况下 RabbitMQ 退出或由于某种原因崩溃时，它忽视队列和消息，除非告知它不要这样做。确保消息不会丢失需要做两件事：**我们需要将队列和消息都标记为持久化。**
 
@@ -276,7 +299,7 @@ public class Task02 {
 
 将消息标记为持久化并不能完全保证不会丢失消息。尽管它告诉 RabbitMQ 将消息保存到磁盘，但是这里依然存在当消息刚准备存储在磁盘的时候 但是还没有存储完，消息还在缓存的一个间隔点。此时并没 有真正写入磁盘。持久性保证并不强，但是对于我们的简单任务队列而言，这已经绰绰有余了。
 
-## 不公平分发
+## 不公平分发(three)
 
 ### 介绍
 
@@ -335,7 +358,7 @@ public class Work03 {
 
 ![image](https://cdn.staticaly.com/gh/xustudyxu/image-hosting1@master/20220724/image.6t9vh6pv6f40.webp)
 
-## 预取值分发
+## 预取值分发(three)
 
 ### 介绍
 
@@ -404,11 +427,11 @@ public class Work03 {
 
 ![image](https://cdn.staticaly.com/gh/xustudyxu/image-hosting1@master/20220724/image.6m3okmfsfrs.webp)
 
-## 发布确认
+## 发布确认(four)
 
 生产者发布消息到 RabbitMQ 后，需要 RabbitMQ 返回「ACK（已收到）」给生产者，这样生产者才知道自己生产的消息成功发布出去。
 
-## 发布确认逻辑
+## 发布确认逻辑(four)
 
 生产者将信道设置成 confirm 模式，一旦信道进入 confirm 模式，所有在该信道上面发布的消息都将会被指派一个唯一的 ID(从 1 开始)，一旦消息被投递到所有匹配的队列之后，broker 就会发送一个确认给生产者(包含消息的唯一 ID)，这就使得生产者知道消息已经正确到达目的队列了，如果消息和队列是可持久化的，那么确认消息会在将消息写入磁盘之后发出，broker 回传给生产者的确认消息中 delivery-tag 域包含了确认消息的序列号，此外 broker 也可以设置 basic.ack 的 multiple 域，表示到这个序列号之前的所有消息都已经得到了处理。
 
