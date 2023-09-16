@@ -1,6 +1,6 @@
 # RabbitMQ 消息应答与发布
 
-## 消息应答（three)
+## 消息应答（c)
 
 消费者完成一个任务可能需要一段时间，如果其中一个消费者处理一个长的任务并仅只完成了部分突然它挂掉了，会发生什么情况。RabbitMQ 一旦向消费者传递了一条消息，便立即将该消息标记为删除。在这种情况下，突然有个消费者挂掉了，我们将丢失正在处理的消息。以及后续发送给该消费者的消息，因为它无法接收到。
 
@@ -215,7 +215,7 @@ public class Worker04 {
 
 ![image](https://cdn.staticaly.com/gh/xustudyxu/image-hosting1@master/20220724/image.7418cd7x0u80.webp)
 
-## RabbitMQ持久化(three)
+## RabbitMQ持久化(c)
 
 当 RabbitMQ 服务停掉以后，消息生产者发送过来的消息不丢失要如何保障？默认情况下 RabbitMQ 退出或由于某种原因崩溃时，它忽视队列和消息，除非告知它不要这样做。确保消息不会丢失需要做两件事：**我们需要将队列和消息都标记为持久化。**
 
@@ -299,7 +299,7 @@ public class Task02 {
 
 将消息标记为持久化并不能完全保证不会丢失消息。尽管它告诉 RabbitMQ 将消息保存到磁盘，但是这里依然存在当消息刚准备存储在磁盘的时候 但是还没有存储完，消息还在缓存的一个间隔点。此时并没 有真正写入磁盘。持久性保证并不强，但是对于我们的简单任务队列而言，这已经绰绰有余了。
 
-## 不公平分发(three)
+## 不公平分发(c)
 
 ### 介绍
 
@@ -358,7 +358,7 @@ public class Work03 {
 
 ![image](https://cdn.staticaly.com/gh/xustudyxu/image-hosting1@master/20220724/image.6t9vh6pv6f40.webp)
 
-## 预取值分发(three)
+## 预取值分发(c)
 
 ### 介绍
 
@@ -427,11 +427,11 @@ public class Work03 {
 
 ![image](https://cdn.staticaly.com/gh/xustudyxu/image-hosting1@master/20220724/image.6m3okmfsfrs.webp)
 
-## 发布确认(four)
+## 发布确认(d)
 
 生产者发布消息到 RabbitMQ 后，需要 RabbitMQ 返回「ACK（已收到）」给生产者，这样生产者才知道自己生产的消息成功发布出去。
 
-## 发布确认逻辑(four)
+## 发布确认逻辑(d)
 
 生产者将信道设置成 confirm 模式，一旦信道进入 confirm 模式，所有在该信道上面发布的消息都将会被指派一个唯一的 ID(从 1 开始)，一旦消息被投递到所有匹配的队列之后，broker 就会发送一个确认给生产者(包含消息的唯一 ID)，这就使得生产者知道消息已经正确到达目的队列了，如果消息和队列是可持久化的，那么确认消息会在将消息写入磁盘之后发出，broker 回传给生产者的确认消息中 delivery-tag 域包含了确认消息的序列号，此外 broker 也可以设置 basic.ack 的 multiple 域，表示到这个序列号之前的所有消息都已经得到了处理。
 

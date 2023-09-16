@@ -21,9 +21,9 @@ chmod 777 /home/lsh/mydata/oracle/oradata
 
 ```shell
 docker run -d  \
--p 1524:1521 -p 5501:5500 \
+-p 1521:1521 -p 5500:5500 \
 -e ORACLE_SID=ORCLCDB \
--e ORACLE_PDB=ORCLPDB1 \
+-e ORACLE_PDB=MYPDB \
 -e ORACLE_PWD=root \
 -e ORACLE_EDITION=standard \
 -e ORACLE_CHARACTERSET=AL32UTF8 \
@@ -39,7 +39,7 @@ docker run -d  \
 # SID用于Navicate连接Oracle
 -e ORACLE_SID=ORCLCDB \
 # PDB是第一个PDB服务器
--e ORACLE_PDB=ORCLPDB1 \
+-e ORACLE_PDB=MYPDB \
 # 密码
 -e ORACLE_PWD=root \
 # 版本
