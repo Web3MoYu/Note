@@ -36,6 +36,15 @@ create table 表名(列名 数据类型[列级约束条件],
              列名 数据类型[列级约束条件],
              ...
              [,表级约束条件])
+-- 表
+CREATE TABLE SIMHR.T_DEDUCTION (
+	N_DEDUC_ID NUMBER generated always AS identity primary key,
+	N_EMP_ID NUMBER NOT NULL references T_EMPLOYEE ( N_EMP_ID ),
+	D_DATE DATE NOT NULL,
+	N_TYPE NUMBER ( 1 ) NOT NULL,
+	F_MONEY NUMBER ( 10, 2 ) NOT NULL,
+	VC_REASON VARCHAR2 ( 300 ) 
+);
 ```
 
 - 例子创建一个学生和教师表
