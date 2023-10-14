@@ -706,12 +706,18 @@ List<User> getAllUser(@Param("tableName") String tableName);
 * keyProperty：因为增删改有统一的返回值是受影响的行数，因此只能将获取的自增的主键放在传输的参数user对象的某个属性中
 */
 int insertUser(User user);
+int insertUser(@Param("user") User user);
 ```
 
 ```xml
 <!--int insertUser(User user);-->
 <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
 	insert into t_user values(null,#{username},#{password},#{age},#{sex})
+</insert>
+
+<!--int insertUser(@Param("user") User user);-->
+<insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+	insert into t_user values(null,#{user.username},#{user.password},#{user.age},#{user.sex})
 </insert>
 ```
 
