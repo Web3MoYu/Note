@@ -291,7 +291,7 @@ public class MsgTtlQueueConfig {
         //设置死信交换机
         arguments.put("x-dead-letter-exchange",Y_DEAD_LETTER_EXCHANGE);
         //设置死信RoutingKey
-        arguments.put("x-dead-letter-routing-key","XC");
+        arguments.put("x-dead-letter-routing-key","YD");
         return QueueBuilder.durable(QUEUE_C).withArguments(arguments).build();
     }
     //声明队列 QC 绑定 X 交换机
