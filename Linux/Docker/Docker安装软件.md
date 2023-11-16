@@ -9,11 +9,12 @@
 - 运行容器
 
   ```bash
-  docker run -d --name mysql_01 -p 3306:3306 -v /home/lsh/mydata/mysql:/var/lib/mysql/ -e MYSQL_ROOT_PASSWORD=root mysql --lower_case_table_names=1
+  docker run -d --hostname mysql --name mysql_01 -p 3306:3306 -v /home/lsh/mydata/mysql:/var/lib/mysql/ -e MYSQL_ROOT_PASSWORD=root mysql --lower_case_table_names=1
   ```
 
   ```
   参数解释
+  --hostname mysql 指定容器的主机名为mysql
   -v：挂载宿主机目录和 docker容器中的目录，前面是宿主机目录，后面是容器内部目录。
   -d：后台运行容器。
   -p：映射容器端口号和宿主机端口号，后者是需要映射的端口号，前者时要映射到哪
@@ -197,7 +198,8 @@ show pdbs;
 
 
   2. 挂载redis的持久化文件
-  建立数据文件放置目录，执行命令：mkdir 目录/redis/data/
+
+    建立数据文件放置目录，执行命令：mkdir 目录/redis/data/
 
 - ```
   关闭保护模式-->protected-mode no
@@ -266,3 +268,52 @@ ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '新密码'
 ```bash
 flush privileges
 ```
+
+# 安装gitlab
+
+- 拉取gitlab镜像
+
+```
+docker pull gitlab/gitlab-ce
+```
+
+- 运行容器
+
+```bash
+sudo docker run -itd \
+  --hostname gitlab \
+  -p 443:443 \
+  -p 80:80 \
+  -p 22:22 \
+  --name gitlab \
+  -v $GITLAB_HOME/config:/etc/gitlab \
+  -v $GITLAB_HOME/logs:/var/log/gitlab \
+  -v $GITLAB_HOME/data:/var/opt/gitlab \
+  --shm-size 256m \
+  gitlab/gitlab-ee:latest
+  
+docker run -itd --hostname gitlab -p 443:443 -p 80:80 -p 22:22 --name gitlab --shm-size 256m gitlab/gitlab-ce
+```
+
+- 解释
+
+  ```bash
+  --hostname 指定容器的主机主机名
+  ch
+  -p 443:443 映射端口
+  -i（或--interactive）表示要保持标准输入（stdin）打开，使得容器可以接收来自终端的输入。
+  -t（或--tty）表示要为容器分配一个伪终端设备（pseudo-TTY），以便能够与容器进行交互。
+  -d（或--detach）表示将容器放入后台运行模式，使得容器在后台运行而不会阻塞终端。
+  ```
+
+- root密码
+
+  默认账号：root，默认密码在 config 目录下的 initial_root_password 文件内。
+
+  ```bash
+  docker exec -it gitlab bash
+  cd /etc/gitlab
+  cat initial_root_password
+  ```
+
+  

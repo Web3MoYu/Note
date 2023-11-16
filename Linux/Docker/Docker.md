@@ -347,6 +347,7 @@ sudo docker cp 00e7d0f73704:/usr/local/arm/rootfs-debian/123.txt /usr/share/
 ```shell
 -it 表示与容器进行交互式启动 
 -d 表示可后台运行容器 （守护式运行）  
+--hostname 主机名 可以指定容器的主机名
 
 --name 给要运行的容器起的名字  /bin/bash  交互路径
 -v <host_path>:<container_path> <image>：将主机的目录挂载到容器内部。
