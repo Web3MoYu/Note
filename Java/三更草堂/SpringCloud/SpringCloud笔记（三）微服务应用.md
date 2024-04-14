@@ -15,20 +15,20 @@
 
 但是我们想一下，我们现在采用的是分布式的系统，那么在用户服务进行登录之后，其他服务比如图书服务和借阅服务，它们会知道用户登录了吗？
 
-![image-20220401220634827](https://tva1.sinaimg.cn/large/e6c9d24ely1h0uko0a27mj21ia08y0u9.jpg)
+![image-20230306234928969](https://s2.loli.net/2023/03/06/hV2JkERda4qKtjB.png)
 
 实际上我们登录到用户服务之后，Session中的用户数据只会在用户服务的应用中保存，而在其他服务中，并没有对应的信息，但是我们现在希望的是，所有的服务都能够同步这些Session信息，这样我们才能实现在用户服务登录之后其他服务都能知道，那么我们该如何实现Session的同步呢？
 
 1. 我们可以在每台服务器上都复制一份Session，但是这样显然是很浪费时间的，并且用户验证数据占用的内存会成倍的增加。
 2. 将Session移出服务器，用统一存储来存放，比如我们可以直接在Redis或是MySQL中存放用户的Session信息，这样所有的服务器在需要获取Session信息时，统一访问Redis或是MySQL即可，这样就能保证所有服务都可以同步Session了（是不是越来越感觉只要有问题，没有什么是加一个中间件解决不了的）
 
-![image-20220402111827054](https://tva1.sinaimg.cn/large/e6c9d24ely1h0v7jwaum4j21qk0amq4h.jpg)
+![image-20230306234940672](https://s2.loli.net/2023/03/06/pqZolFN6eIPza52.png)
 
 那么，我们就着重来研究一下，然后实现2号方案，这里我们就使用Redis作为Session统一存储，我们把一开始的压缩包重新解压一次，又来从头开始编写吧。
 
 这里我们就只使用Nacos就行了，和之前一样，我们把Nacos的包导入一下，然后进行一些配置：
 
-![image-20220402105512397](https://tva1.sinaimg.cn/large/e6c9d24ely1h0v6vpkivcj22ca0baju3.jpg)
+![image-20230306234948408](https://s2.loli.net/2023/03/06/FYcNvAuZ7z8rj2V.png)
 
 现在我们需要为每个服务都添加验证机制，首先导入依赖：
 
@@ -70,29 +70,29 @@ spring:
 
 我们来打开Nacos看看：
 
-![image-20220402105638986](https://tva1.sinaimg.cn/large/e6c9d24ely1h0v6x7rkvuj22cm09sq4s.jpg)
+![image-20230306234959085](https://s2.loli.net/2023/03/06/SyCJXKgO3qGx8EL.png)
 
 可以看到三个服务都正常注册了，接着我们去访问图书服务：
 
-![image-20220402105803658](https://tva1.sinaimg.cn/large/e6c9d24ely1h0v6yoo6hbj226g0jkjsy.jpg)
+![image-20230306235007563](https://s2.loli.net/2023/03/06/gytqnZjTMvVEUm3.png)
 
 可以看到，访问失败，直接把我们给重定向到登陆页面了，也就是说必须登陆之后才能访问，同样的方式去访问其他服务，也是一样的效果。
 
 由于现在是统一Session存储，那么我们就可以在任意一个服务登录之后，其他服务都可以正常访问，现在我们在当前页面登录，登录之后可以看到图书服务能够正常访问了：
 
-![image-20220402110245827](https://tva1.sinaimg.cn/large/e6c9d24ely1h0v73kpsaaj219u06a0tg.jpg)
+![image-20230306235015909](https://s2.loli.net/2023/03/06/xfV5oYGvc1jKqTM.png)
 
 同时用户服务也能正常访问了：
 
-![image-20220402110328674](https://tva1.sinaimg.cn/large/e6c9d24ely1h0v74bgewzj216m06874r.jpg)
+![image-20230306235021694](https://s2.loli.net/2023/03/06/OH6wjLVreot4IiA.png)
 
 我们可以查看一下Redis服务器中是不是存储了我们的Session信息：
 
-![image-20220402110416031](https://tva1.sinaimg.cn/large/e6c9d24ely1h0v754p9ihj20z8048aax.jpg)
+![image-20230306235046117](https://s2.loli.net/2023/03/06/nNIkoXOAYuMH8aV.png)
 
 虽然看起来好像确实没啥问题了，但是借阅服务炸了，我们来看看为什么：
 
-![image-20220402110519893](https://tva1.sinaimg.cn/large/e6c9d24ely1h0v768pgt2j21sk096q7k.jpg)
+![image-20230306235053840](https://s2.loli.net/2023/03/06/wls5vCajnuMBOkU.png)
 
 在RestTemplate进行远程调用的时候，由于我们的请求没有携带对应SESSION的Cookie，所以导致验证失败，访问不成功，返回401，所以虽然这种方案看起来比较合理，但是在我们的实际使用中，还是存在一些不便的。
 
@@ -100,15 +100,15 @@ spring:
 
 ## OAuth 2.0 实现单点登录
 
-**注意：**第一次接触可能会比较难，不太好理解，需要多实践和观察。
+**注意：** 第一次接触可能会比较难，不太好理解，需要多实践和观察。
 
 前面我们虽然使用了统一存储来解决Session共享问题，但是我们发现就算实现了Session共享，依然存在一些问题，由于我们每个服务都有自己的验证模块，实际上整个系统是存在冗余功能的、同时还有我们上面出现的问题，那么能否实现只在一个服务进行登录，就可以访问其他的服务呢？
 
-![image-20220408223238760](https://tva1.sinaimg.cn/large/e6c9d24ely1h12or8uglrj21s20gawh8.jpg)
+![image-20230306235102514](https://s2.loli.net/2023/03/06/46ukOAiDzMZBX15.png)
 
 实际上之前的登录模式称为多点登录，而我们希望的是实现单点登陆，因此，我们得找一个更好的解决方案。
 
-这里我们首先需要了解一种全新的登录方式：**OAuth 2.0**，我们经常看到一些网站支持第三方登录，比如淘宝、咸鱼我们就可以使用支付宝进行登录，腾讯游戏可以用QQ或是微信登陆，以及微信小程序都可以直接使用微信进行登录。我们知道它们并不是属于同一个系统，比如淘宝和咸鱼都不属于支付宝这个应用，但是由于需要获取支付宝的用户信息，这时我们就需要使用 OAuth2.0 来实现第三方授权，基于第三方应用访问用户信息的权限（本质上就是给别人调用自己服务接口的权限），那么它是如何实现的呢？
+这里我们首先需要了解一种全新的登录方式：**OAuth 2.0**，我们经常看到一些网站支持第三方登录，比如淘宝、咸鱼我们就可以使用支付宝进行登录，腾讯游戏可以用QQ或是微信登陆，以及微信小程序都可以直接使用微信进行登录。我们知道它们并不是属于同一个系统，比如淘宝和咸鱼都不属于支付宝这个应用，但是由于需要获取支付宝的用户信息，这时我们就需要使用 OAuth2.0 来实现第三方授权，基于第三方应用访问用户信息的权限（本质上就是给别人调用自己服务接口的权限)，那么它是如何实现的呢？
 
 ### 四种授权模式
 
@@ -120,7 +120,7 @@ spring:
 
    当然，这里的前端页面只是一个例子，它还可以是其他任何类型的**客户端**，比如App、小程序甚至是第三方应用的服务。
 
-   ![image-20220409213716233](https://tva1.sinaimg.cn/large/e6c9d24ely1h13srxpu4pj21720940tz.jpg)
+   ![image-20230306235141113](https://s2.loli.net/2023/03/06/4i16wzqOnYeaB2c.png)
 
    虽然这种模式比较简便，但是已经失去了用户验证的意义，压根就不是给用户校验准备的，而是更适用于服务内部调用的场景。
 
@@ -128,7 +128,7 @@ spring:
 
    密码模式相比客户端模式，就多了用户名和密码的信息，用户需要提供对应账号的用户名和密码，才能获取到Token。
 
-   ![image-20220409213646255](https://tva1.sinaimg.cn/large/e6c9d24ely1h13srezf2xj218k09c0u6.jpg)
+   ![image-20230306235151635](https://s2.loli.net/2023/03/06/JEreS9nQD8ojMca.png)
 
    虽然这样看起来比较合理，但是会直接将账号和密码泄露给客户端，需要后台完全信任客户端不会拿账号密码去干其他坏事，所以这也不是我们常见的。
 
@@ -136,7 +136,7 @@ spring:
 
    首先用户访问页面时，会重定向到认证服务器，接着认证服务器给用户一个认证页面，等待用户授权，用户填写信息完成授权后，认证服务器返回Token。
 
-   ![image-20220409211722092](https://tva1.sinaimg.cn/large/e6c9d24ely1h13s7a0nxzj21ey0da0uw.jpg)
+   ![image-20230306235200365](https://s2.loli.net/2023/03/06/MRxnKyWT3br5Zj2.png)
 
    它适用于没有服务端的第三方应用页面，并且相比前面一种形式，验证都是在验证服务器进行的，敏感信息不会轻易泄露，但是Token依然存在泄露的风险。
 
@@ -146,7 +146,7 @@ spring:
 
    相比隐式授权模式，它并不会直接返回Token，而是返回授权码，真正的Token是通过应用服务器访问验证服务器获得的。在一开始的时候，应用服务器（客户端通过访问自己的应用服务器来进而访问其他服务）和验证服务器之间会共享一个`secret`，这个东西没有其他人知道，而验证服务器在用户验证完成之后，会返回一个授权码，应用服务器最后将授权码和`secret`一起交给验证服务器进行验证，并且Token也是在服务端之间传递，不会直接给到客户端。
 
-   ![image-20220409223317823](https://tva1.sinaimg.cn/large/e6c9d24ely1h13ue89sjxj21dg0fq40y.jpg)
+   ![image-20230306235211335](https://s2.loli.net/2023/03/06/2EIPfirBOKbcndk.png)
 
    这样就算有人中途窃取了授权码，也毫无意义，因为，Token的获取必须同时携带授权码和secret，但是`secret`第三方是无法得知的，并且Token不会直接丢给客户端，大大减少了泄露的风险。
 
@@ -283,41 +283,41 @@ public class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
 
 接着我们就可以启动服务器了：
 
-![image-20220410123941157](https://tva1.sinaimg.cn/large/e6c9d24ely1h14iuwapslj220008ejx2.jpg)
+![image-20230306235226961](https://s2.loli.net/2023/03/06/2FhnOKe1BorP5NE.png)
 
 然后我们使用Postman进行接口测试，首先我们从最简单的客户端模式进行测试，客户端模式只需要提供id和secret即可直接拿到Token，注意需要再添加一个grant_type来表明我们的授权方式，默认请求路径为http://localhost:8500/sso/oauth/token：
 
-![image-20220410125437766](https://tva1.sinaimg.cn/large/e6c9d24ely1h14jafpizcj21cw0eg76a.jpg)
+![image-20230306235236376](https://s2.loli.net/2023/03/06/X81T7mz5gQK3iBk.png)
 
 发起请求后，可以看到我们得到了Token，它是以JSON格式给到我们的：
 
-![image-20220410125831300](https://tva1.sinaimg.cn/large/e6c9d24ely1h14jehayojj21cw0am0ty.jpg)
+![image-20230306235248456](https://s2.loli.net/2023/03/06/84IKgq2xdvBeLTm.png)
 
 我们还可以访问 http://localhost:8500/sso/oauth/check_token 来验证我们的Token是否有效：
 
-![image-20220410130204734](https://tva1.sinaimg.cn/large/e6c9d24ely1h14ji6rg42j21bk0cgmym.jpg)
+![image-20230306235257995](https://s2.loli.net/2023/03/06/SXD8FjzZn7ev2B3.png)
 
-![image-20220410130223312](https://tva1.sinaimg.cn/large/e6c9d24ely1h14jiieikmj21bi0ew75d.jpg)
+![image-20230306235309409](https://s2.loli.net/2023/03/06/B9TzojnUq4KvVPr.png)
 
 可以看到active为true，表示我们刚刚申请到的Token是有效的。
 
 接着我们来测试一下第二种password模式，我们还需要提供具体的用户名和密码，授权模式定义为password即可：
 
-![image-20220410130958929](https://tva1.sinaimg.cn/large/e6c9d24ely1h14jqelib5j21bg0fg0u9.jpg)
+![image-20230306235318785](https://s2.loli.net/2023/03/06/jt5XPZKvRFqr73x.png)
 
 接着我们需要在请求头中添加Basic验证信息，这里我们直接填写id和secret即可：
 
-![image-20220410130819980](https://tva1.sinaimg.cn/large/e6c9d24ely1h14jooye3nj21b00d4q4n.jpg)
+![image-20230306235327745](https://s2.loli.net/2023/03/06/K9ZpIv8SzcfsHd4.png)
 
 可以看到在请求头中自动生成了Basic验证相关内容：
 
-![image-20220410130942662](https://tva1.sinaimg.cn/large/e6c9d24ely1h14jq4t7y9j21a207s751.jpg)
+![image-20230306235335919](https://s2.loli.net/2023/03/06/JHxPKgFU5wY7SB8.png)
 
-![image-20220410131048992](https://tva1.sinaimg.cn/large/e6c9d24ely1h14jra2ysyj21ay0bgta5.jpg)
+![image-20230306235345388](https://s2.loli.net/2023/03/06/F3WU7XhqridywVn.png)
 
 响应成功，得到Token信息，并且这里还多出了一个refresh_token，这是用于刷新Token的，我们之后会进行讲解。
 
-![image-20220410131641887](https://tva1.sinaimg.cn/large/e6c9d24ely1h14jxemfuxj21d20fcjsq.jpg)
+![image-20230306235355181](https://s2.loli.net/2023/03/06/zjuc2qxQmBas5r1.png)
 
 查询Token信息之后还可以看到登录的具体用户以及角色权限等。
 
@@ -325,11 +325,11 @@ public class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
 
 注意response_type一定要是token类型，这样才会直接返回Token，浏览器发起请求后，可以看到熟悉而又陌生的界面，没错，实际上这里就是使用我们之前讲解的SpringSecurity进行登陆，当然也可以配置一下记住我之类的功能，这里就不演示了：
 
-![image-20220410132507626](https://tva1.sinaimg.cn/large/e6c9d24ely1h14k666r5sj22aq0js0ue.jpg)
+![image-20230306235441824](https://s2.loli.net/2023/03/06/OYeRQpEXFSoZMhc.png)
 
 但是登录之后我们发现出现了一个错误：
 
-![image-20220410132557704](https://tva1.sinaimg.cn/large/e6c9d24ely1h14k71g3joj21ae0a60u3.jpg)
+![image-20230306235501474](https://s2.loli.net/2023/03/06/qLUkJFZau8eQ6WO.png)
 
 这是因为登录成功之后，验证服务器需要将结果给回客户端，所以需要提供客户端的回调地址，这样浏览器就会被重定向到指定的回调地址并且请求中会携带Token信息，这里我们随便配置一个回调地址：
 
@@ -349,15 +349,15 @@ public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 
 接着重启验证服务器，再次访问：
 
-![image-20220410132927907](https://tva1.sinaimg.cn/large/e6c9d24ely1h14kaonj56j21fw0gw40h.jpg)
+![image-20230306235513330](https://s2.loli.net/2023/03/06/PnTwQhlYXDgBvry.png)
 
 可以看到这里会让我们选择哪些范围进行授权，就像我们在微信小程序中登陆一样，会让我们授予用户信息权限、支付权限、信用查询权限等，我们可以自由决定要不要给客户端授予访问这些资源的权限，这里我们全部选择授予：
 
-![image-20220410133106639](https://tva1.sinaimg.cn/large/e6c9d24ely1h14kcehaeej21ye08o758.jpg)
+![image-20230306235521432](https://s2.loli.net/2023/03/06/p7nMEVZIKjXWAl5.png)
 
 授予之后，可以看到浏览器被重定向到我们刚刚指定的回调地址中，并且携带了Token信息，现在我们来校验一下看看：
 
-![image-20220410133210183](https://tva1.sinaimg.cn/large/e6c9d24ely1h14kdhpibjj21d00e675i.jpg)
+![image-20230306235530288](https://s2.loli.net/2023/03/06/g1JhS9WDfcz6QEK.png)
 
 可以看到，Token也是有效的。
 
@@ -365,27 +365,27 @@ public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 
 可以看到访问之后，依然会进入到回调地址，但是这时给的就是授权码了，而不是直接给Token，那么这个Token该怎么获取呢？
 
-![image-20220410133411554](https://tva1.sinaimg.cn/large/e6c9d24ely1h14kflls50j2178066glw.jpg)
+![image-20230306235536317](https://s2.loli.net/2023/03/06/da4WseDt172hbLV.png)
 
 按照我们之前讲解的原理，我们需要携带授权码和secret一起请求，才能拿到Token，正常情况下是由回调的服务器进行处理，这里我们就在Postman中进行，我们复制刚刚得到的授权码，接口依然是`localhost:8500/sso/oauth/token`：
 
-![image-20220410133702534](https://tva1.sinaimg.cn/large/e6c9d24ely1h14kike171j21ba0f8404.jpg)
+![image-20230306235545717](https://s2.loli.net/2023/03/06/e1Zdt9IP7vp2zMO.png)
 
 可以看到结果也是正常返回了Token信息：
 
-![image-20220410133940312](https://tva1.sinaimg.cn/large/e6c9d24ely1h14klb6srtj21be0bmgn6.jpg)
+![image-20230306235554061](https://s2.loli.net/2023/03/06/qY5kxgBWSzMJXco.png)
 
 这样我们四种最基本的Token请求方式就实现了。
 
 最后还有一个是刷新令牌使用的，当我们的Token过期时，我们就可以使用这个refresh_token来申请一个新的Token：
 
-![image-20220410140759967](https://tva1.sinaimg.cn/large/e6c9d24ely1h14lesf7waj21bc0giq4u.jpg)
+![image-20230306235603731](https://s2.loli.net/2023/03/06/d2ojclCLB3mQu7D.png)
 
 但是执行之后我们发现会直接出现一个内部错误：
 
-![image-20220410140822286](https://tva1.sinaimg.cn/large/e6c9d24ely1h14lf5oqckj217804mt8w.jpg)
+![image-20230306235611413](https://s2.loli.net/2023/03/06/BcFMIg4NqCx8kdh.png)
 
-![image-20220410140838064](https://tva1.sinaimg.cn/large/e6c9d24ely1h14lffhh02j21w601qmy6.jpg)
+![image-20230306235618838](https://s2.loli.net/2023/03/06/cA9WF1KxyUDZ8Bi.png)
 
 查看日志发现，这里还需要我们单独配置一个UserDetailsService，我们直接把Security中的实例注册为Bean：
 
@@ -413,7 +413,7 @@ public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
 
 最后再次尝试刷新Token：
 
-![image-20220410141143519](https://tva1.sinaimg.cn/large/e6c9d24ely1h14linq3lkj21bc0bumyp.jpg)
+![image-20230306235638503](https://s2.loli.net/2023/03/06/QWEwzpiq7FXnv3f.png)
 
 OK，成功刷新Token，返回了一个新的。
 
@@ -497,11 +497,11 @@ security:
 
 现在我们就开启图书服务，调用图书接口：
 
-![image-20220410144654362](https://tva1.sinaimg.cn/large/e6c9d24ely1h14mj9etfuj22730u0q8o.jpg)
+![image-20230306235651433](https://s2.loli.net/2023/03/06/DrVSZtdKNCoMucx.png)
 
 可以看到在发现没有登录验证时，会直接跳转到授权页面，进行授权登录，之后才可以继续访问图书服务：
 
-![image-20220410144806506](https://tva1.sinaimg.cn/large/e6c9d24ely1h14mkinbbyj219806mjs1.jpg)
+![image-20230306235701725](https://s2.loli.net/2023/03/06/nsJGmxcOVYXDUqd.png)
 
 那么用户信息呢？是否也一并保存过来了？我们这里直接获取一下SpringSecurity的Context查看用户信息，获取方式跟我们之前的视频中讲解的是一样的：
 
@@ -517,7 +517,7 @@ Book findBookById(@PathVariable("bid") int bid){
 
 再次访问图书管理接口，可以看到：
 
-![image-20220410145224153](https://tva1.sinaimg.cn/large/e6c9d24ely1h14moza8zuj220k01adge.jpg)
+![image-20230306235733777](https://s2.loli.net/2023/03/06/y1VYRC9tmOv854u.png)
 
 这里使用的不是之前的UsernamePasswordAuthenticationToken也不是RememberMeAuthenticationToken，而是新的OAuth2Authentication，它保存了验证服务器的一些信息，以及经过我们之前的登陆流程之后，验证服务器发放给客户端的Token信息，并通过Token信息在验证服务器进行验证获取用户信息，最后保存到Session中，表示用户已验证，所以本质上还是要依赖浏览器存Cookie的。
 
@@ -541,7 +541,7 @@ public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 
 但是我们发现一个问题，就是由于SESSION不同步，每次切换不同的服务进行访问都会重新导验证服务器去验证一次：
 
-![image-20220410160648326](https://tva1.sinaimg.cn/large/e6c9d24ely1h14oue66ytj212606wq42.jpg)
+![image-20230306235744660](https://s2.loli.net/2023/03/06/7zbqlOrSCVRdQ4y.png)
 
 这里有两个方案：
 
@@ -584,7 +584,7 @@ security:
 
 配置完成后，我们启动服务器，直接访问会发现：
 
-![image-20220411090932561](https://tva1.sinaimg.cn/large/e6c9d24ely1h15iekw720j21mw0b0mz5.jpg)
+![image-20230306235756676](https://s2.loli.net/2023/03/06/QiZmqznyMxNpETk.png)
 
 这是由于我们的请求头中没有携带Token信息，现在有两种方式可以访问此资源：
 
@@ -593,17 +593,17 @@ security:
 
 我们先来试试看最简的一种：
 
-![image-20220411091259795](https://tva1.sinaimg.cn/large/e6c9d24ely1h15ii54emij2176066wfi.jpg)
+![image-20230306235804196](https://s2.loli.net/2023/03/06/Np6PKCZD2kAdmtf.png)
 
 另一种我们需要使用Postman来完成：
 
-![image-20220411091514501](https://tva1.sinaimg.cn/large/e6c9d24ely1h15ikgy886j21c60ikjty.jpg)
+![image-20230306235814228](https://s2.loli.net/2023/03/06/ypR3G7DxsYicMQI.png)
 
 添加验证信息后，会帮助我们转换成请求头信息：
 
-![image-20220411091655947](https://tva1.sinaimg.cn/large/e6c9d24ely1h15im8lcwuj21b008cwfo.jpg)
+![image-20230306235826416](https://s2.loli.net/2023/03/06/qPHDU1dXgC7srn3.png)
 
-![image-20220411091722652](https://tva1.sinaimg.cn/large/e6c9d24ely1h15imovn8jj216m056aaa.jpg)
+![image-20230306235833330](https://s2.loli.net/2023/03/06/6IeMvTcCKdfbUlV.png)
 
 这样我们就将资源服务器搭建完成了。
 
@@ -625,7 +625,7 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter { //�
 
 可以看到当没有对应的scope授权时，那么会直接返回`insufficient_scope`错误：
 
-![image-20220411092852367](https://tva1.sinaimg.cn/large/e6c9d24ely1h15iynrm44j21d00acjth.jpg)
+![image-20230306235844783](https://s2.loli.net/2023/03/06/5T4d39YkcZIomvD.png)
 
 不知道各位是否有发现，实际上资源服务器完全没有必要将Security的信息保存在Session中了，因为现在只需要将Token告诉资源服务器，那么资源服务器就可以联系验证服务器，得到用户信息，就不需要使用之前的Session存储机制了，所以你会发现HttpSession中没有**SPRING_SECURITY_CONTEXT**，现在Security信息都是通过连接资源服务器获取。
 
@@ -633,7 +633,7 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter { //�
 
 但是还有一个问题没有解决，我们在使用RestTemplate进行服务间的远程调用时，会得到以下错误：
 
-![image-20220411115958560](https://tva1.sinaimg.cn/large/e6c9d24ely1h15nbvmhyqj21zo070n12.jpg)
+![image-20230306235853397](https://s2.loli.net/2023/03/06/k3LmR9E7UBtVA5x.png)
 
 实际上这是因为在服务调用时没有携带Token信息，我们得想个办法把用户传来的Token信息在进行远程调用时也携带上，因此，我们可以直接使用OAuth2RestTemplate，它会在请求其他服务时携带当前请求的Token信息。它继承自RestTemplate，这里我们直接定义一个Bean：
 
@@ -679,7 +679,7 @@ public class BorrowServiceImpl implements BorrowService {
 
 可以看到服务成功调用了：
 
-![image-20220411124509007](https://tva1.sinaimg.cn/large/e6c9d24ely1h15omvqe0nj21im06emyf.jpg)
+![image-20230306235903496](https://s2.loli.net/2023/03/06/mvKqyJk7P1FCQSl.png)
 
 现在我们来将Nacos加入，并通过Feign实现远程调用。
 
@@ -709,7 +709,7 @@ public class BorrowServiceImpl implements BorrowService {
 
 所有服务都已经注册成功了：
 
-![image-20220411132756540](https://tva1.sinaimg.cn/large/e6c9d24ely1h15pvei9c9j220w0cgdia.jpg)
+![image-20230306235926214](https://s2.loli.net/2023/03/06/BqkomFVGK7wv64X.png)
 
 接着我们配置一下借阅服务的负载均衡：
 
@@ -728,7 +728,7 @@ public class WebConfiguration {
 }
 ```
 
-![image-20220411133819847](https://tva1.sinaimg.cn/large/e6c9d24ely1h15q67k904j21ho06a75k.jpg)
+![image-20230306235934751](https://s2.loli.net/2023/03/06/PZkS8GyU1jhpIrz.png)
 
 现在我们来把它替换为Feign，老样子，两个客户端：
 
@@ -752,7 +752,7 @@ public interface BookClient {
 
 但是配置完成之后，又出现刚刚的问题了，OpenFeign也没有携带Token进行访问：
 
-![image-20220411135612728](https://tva1.sinaimg.cn/large/e6c9d24ely1h15qotlr59j21zq06s77b.jpg)
+![image-20230306235944272](https://s2.loli.net/2023/03/06/EzWuaAJgNLi3sdF.png)
 
 那么怎么配置Feign携带Token访问呢？遇到这种问题直接去官方查：https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/#oauth2-support，非常简单，两个配置就搞定：
 
@@ -767,7 +767,7 @@ feign:
 
 重启服务器，可以看到结果OK了：
 
-![image-20220411143628451](https://tva1.sinaimg.cn/large/e6c9d24ely1h15rupqldmj21ko07kmyl.jpg)
+![image-20230306235953555](https://s2.loli.net/2023/03/06/zgEJF7AeHw8iGIZ.png)
 
 这样我们就成功将之前的三个服务作为资源服务器了，注意和我们上面的作为客户端是不同的，将服务直接作为客户端相当于只需要验证通过即可，并且还是要保存Session信息，相当于只是将登录流程换到统一的验证服务器上进行罢了。而将其作为资源服务器，那么就需要另外找客户端（可以是浏览器、小程序、App、第三方服务等）来访问，并且也是需要先进行验证然后再通过携带Token进行访问，这种模式是我们比较常见的模式。
 
@@ -781,7 +781,7 @@ JSON Web Token令牌（JWT）是一个开放标准（[RFC 7519](https://tools.ie
 
 JWT令牌的格式如下：
 
-![image-20220412083957167](https://tva1.sinaimg.cn/large/e6c9d24ely1h16n64387aj22b10u0wjb.jpg)
+![image-20230307000004710](https://s2.loli.net/2023/03/07/Xu8lxYhKoJNr6it.png)
 
 一个JWT令牌由3部分组成：标头(Header)、有效载荷(Payload)和签名(Signature)。在传输的时候，会将JWT的3部分分别进行Base64编码后用`.`进行连接形成最终需要传输的字符串。
 
@@ -791,7 +791,7 @@ JWT令牌的格式如下：
 
 这里还是补充一下一些概念，因为很多东西都是我们之前没有接触过的：
 
-* **Base64：**就是包括小写字母a-z、大写字母A-Z、数字0-9、符号"+"、"/"一共64个字符的字符集（末尾还有1个或多个`=`用来凑够字节数），任何的符号都可以转换成这个字符集中的字符，这个转换过程就叫做Base64编码，编码之后会生成只包含上述64个字符的字符串。相反，如果需要原本的内容，我们也可以进行Base64解码，回到原有的样子。
+* **Base64：** 就是包括小写字母a-z、大写字母A-Z、数字0-9、符号"+"、"/"一共64个字符的字符集（末尾还有1个或多个`=`用来凑够字节数），任何的符号都可以转换成这个字符集中的字符，这个转换过程就叫做Base64编码，编码之后会生成只包含上述64个字符的字符串。相反，如果需要原本的内容，我们也可以进行Base64解码，回到原有的样子。
 
   ```java
   public void test(){
@@ -806,7 +806,7 @@ JWT令牌的格式如下：
 
   注意Base64不是加密算法，只是一种信息的编码方式而已。
 
-* **加密算法：**加密算法分为对称加密和非对称加密，其中**对称加密（Symmetric Cryptography）**比较好理解，就像一把锁配了两把钥匙一样，这两把钥匙你和别人都有一把，然后你们直接传递数据，都会把数据用锁给锁上，就算传递的途中有人把数据窃取了，也没办法解密，因为钥匙只有你和对方有，没有钥匙无法进行解密，但是这样有个问题，既然解密的关键在于钥匙本身，那么如果有人不仅窃取了数据，而且对方那边的治安也不好，于是顺手就偷走了钥匙，那你们之间发的数据不就凉凉了吗。
+* **加密算法：** 加密算法分为对称加密和非对称加密，其中**对称加密（Symmetric Cryptography）**比较好理解，就像一把锁配了两把钥匙一样，这两把钥匙你和别人都有一把，然后你们直接传递数据，都会把数据用锁给锁上，就算传递的途中有人把数据窃取了，也没办法解密，因为钥匙只有你和对方有，没有钥匙无法进行解密，但是这样有个问题，既然解密的关键在于钥匙本身，那么如果有人不仅窃取了数据，而且对方那边的治安也不好，于是顺手就偷走了钥匙，那你们之间发的数据不就凉凉了吗。
 
   因此，**非对称加密（Asymmetric Cryptography）**算法出现了，它并不是直接生成一把钥匙，而是生成一个公钥和一个私钥，私钥只能由你保管，而公钥交给对方或是你要发送的任何人都行，现在你需要把数据传给对方，那么就需要使用私钥进行加密，但是，这个数据只能使用对应的公钥进行解密，相反，如果对方需要给你发送数据，那么就需要用公钥进行加密，而数据只能使用私钥进行解密，这样的话就算对方的公钥被窃取，那么别人发给你的数据也没办法解密出来，因为需要私钥才能解密，而只有你才有私钥。
 
@@ -814,13 +814,13 @@ JWT令牌的格式如下：
 
   对称加密和非对称加密都有很多的算法，比如对称加密，就有：DES、IDEA、RC2，非对称加密有：RSA、DAS、ECC
 
-* **不可逆加密算法：**常见的不可逆加密算法有MD5, HMAC, SHA-1, SHA-224, SHA-256, SHA-384, 和SHA-512, 其中SHA-224、SHA-256、SHA-384，和SHA-512我们可以统称为SHA2加密算法，SHA加密算法的安全性要比MD5更高，而SHA2加密算法比SHA1的要高，其中SHA后面的数字表示的是加密后的字符串长度，SHA1默认会产生一个160位的信息摘要。经过不可逆加密算法得到的加密结果，是无法解密回去的，也就是说加密出来是什么就是什么了。本质上，其就是一种哈希函数，用于对一段信息产生摘要，以**防止被篡改**。
+* **不可逆加密算法：** 常见的不可逆加密算法有MD5, HMAC, SHA-1, SHA-224, SHA-256, SHA-384, 和SHA-512, 其中SHA-224、SHA-256、SHA-384，和SHA-512我们可以统称为SHA2加密算法，SHA加密算法的安全性要比MD5更高，而SHA2加密算法比SHA1的要高，其中SHA后面的数字表示的是加密后的字符串长度，SHA1默认会产生一个160位的信息摘要。经过不可逆加密算法得到的加密结果，是无法解密回去的，也就是说加密出来是什么就是什么了。本质上，其就是一种哈希函数，用于对一段信息产生摘要，以**防止被篡改**。
 
   实际上这种算法就常常被用作信息摘要计算，同样的数据通过同样的算法计算得到的结果肯定也一样，而如果数据被修改，那么计算的结果肯定就不一样了。
 
 这里我们就可以利用jwt，将我们的Token采用新的方式进行存储：
 
-![image-20220412113124880](https://tva1.sinaimg.cn/large/e6c9d24ely1h16s4h08b9j21ku0dumz4.jpg)
+![image-20230307000016944](https://s2.loli.net/2023/03/07/W95CFKAmd1wfgSJ.png)
 
 这里我们使用最简单的一种方式，对称密钥，我们需要对验证服务器进行一些修改：
 
@@ -864,11 +864,11 @@ public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
 
 然后我们就可以重启验证服务器了：
 
-![image-20220412115919019](https://tva1.sinaimg.cn/large/e6c9d24ely1h16sxi8zk7j21c20dkdjy.jpg)
+![image-20230307000026772](https://s2.loli.net/2023/03/07/C6OteoFghrxpYjQ.png)
 
 可以看到成功获取了AccessToken，但是这里的格式跟我们之前的格式就大不相同了，因为现在它是JWT令牌，我们可以对其进行一下Base64解码：
 
-![image-20220412120136453](https://tva1.sinaimg.cn/large/e6c9d24ely1h16szvyek8j22om0dsmzi.jpg)
+![image-20230307000035581](https://s2.loli.net/2023/03/07/CUMkrRfgOthZKVz.png)
 
 可以看到所有的验证信息包含在内，现在我们对资源服务器进行配置：
 
@@ -882,15 +882,15 @@ security:
 
 然后启动资源服务器，请求一下接口试试看：
 
-![image-20220412120350331](https://tva1.sinaimg.cn/large/e6c9d24ely1h16t27q8g1j21b60foacd.jpg)
+![image-20230307000043443](https://s2.loli.net/2023/03/07/kOpRlTB7SPtQa4y.png)
 
 请求成功，得到数据：
 
-![image-20220412120417005](https://tva1.sinaimg.cn/large/e6c9d24ely1h16t2o2neej21ca08074t.jpg)
+![image-20230307000053404](https://s2.loli.net/2023/03/07/aicW89KezTSZ7f5.png)
 
 注意如果Token有误，那么会得到：
 
-![image-20220412120441794](https://tva1.sinaimg.cn/large/e6c9d24ely1h16t33dv9kj215m04uaab.jpg)
+![image-20230307000101304](https://s2.loli.net/2023/03/07/4wFZx8kNY5WHnvy.png)
 
 ***
 
@@ -902,7 +902,7 @@ security:
 
 在分布式场景下，我们可以考虑让Redis实现主从模式：
 
-![image-20220412161901616](https://tva1.sinaimg.cn/large/e6c9d24ely1h170fqh9k0j21ao07gwf9.jpg)
+![image-20230307000109568](https://s2.loli.net/2023/03/07/bzwPflgBD5O1saN.png)
 
 主从复制，是指将一台Redis服务器的数据，复制到其他的Redis服务器。前者称为主节点(Master)，后者称为从节点(Slave)，数据的复制是单向的，只能由主节点到从节点。Master以写为主，Slave 以读为主。
 
@@ -921,19 +921,19 @@ port 6001
 
 一个服务器的端口设定为6001，复制一份，另一个的端口为6002，接着我们指定配置文件进行启动，打开cmd：
 
-![image-20220413115227344](https://tva1.sinaimg.cn/large/e6c9d24ely1h17ycpqc7aj21ho0iytcq.jpg)
+![image-20230307000143566](https://s2.loli.net/2023/03/07/Si54lok9eqtKPf1.png)
 
 现在我们的两个服务器就启动成功了，接着我们可以使用命令查看当前服务器的主从状态，我们打开客户端：
 
-![image-20220413115458597](https://tva1.sinaimg.cn/large/e6c9d24ely1h17yfaen55j21ge0d6dj4.jpg)
+![image-20230307000151282](https://s2.loli.net/2023/03/07/2TbMQeZknSOzFpy.png)
 
 输入`info replication`命令来查看当前的主从状态，可以看到默认的角色为：master，也就是说所有的服务器在启动之后都是主节点的状态。那么现在我们希望让6002作为从节点，通过一个命令即可：
 
-![image-20220413115722765](https://tva1.sinaimg.cn/large/e6c9d24ely1h17yhstlr6j21hk0k078p.jpg)
+![image-20230307000200296](https://s2.loli.net/2023/03/07/XqpNcihJ5jsZRoI.png)
 
 可以看到，在输入`replicaof 127.0.0.1 6001`命令后，就会将6001服务器作为主节点，而当前节点作为6001的从节点，并且角色也会变成：slave，接着我们来看看6001的情况：
 
-![image-20220413115959759](https://tva1.sinaimg.cn/large/e6c9d24ely1h17ykiln90j21cq0c4tbw.jpg)
+![image-20230307000208687](https://s2.loli.net/2023/03/07/YABKJDsbQkE1UM5.png)
 
 可以看到从节点信息中已经出现了6002服务器，也就是说现在我们的6001和6002就形成了主从关系（还包含一个偏移量，这个偏移量反应的是从节点的同步情况）
 
@@ -941,19 +941,19 @@ port 6001
 
 那么我们现在可以来测试一下，在主节点新增数据，看看是否会同步到从节点：
 
-![image-20220413120133934](https://tva1.sinaimg.cn/large/e6c9d24ely1h17ym5549oj219w06kjs4.jpg)
+![image-20230307000216155](https://s2.loli.net/2023/03/07/taxoisA8Tpg2DWM.png)
 
 可以看到，我们在6001服务器插入的`a`，可以在从节点6002读取到，那么，从节点新增的数据在主节点能得到吗？我们来测试一下：
 
-![image-20220413120235138](https://tva1.sinaimg.cn/large/e6c9d24ely1h17yn7gu6zj20xy0323z1.jpg)
+![image-20230307000224291](https://s2.loli.net/2023/03/07/dS2V8xafPj6lKND.png)
 
 可以看到，从节点压根就没办法进行数据插入，节点的模式为只读模式。那么如果我们现在不想让6002作为6001的从节点了呢？
 
-![image-20220413124021549](https://tva1.sinaimg.cn/large/e6c9d24ely1h17zqijbfmj21bu09s76d.jpg)
+![image-20230307000234718](https://s2.loli.net/2023/03/07/dV7Rxov6pblW2g5.png)
 
 可以看到，通过输入`replicaof no one`，即可变回Master角色。接着我们再来启动一台6003服务器，流程是一样的：
 
-![image-20220413121338391](https://tva1.sinaimg.cn/large/e6c9d24ely1h17yypexpij215c062gmg.jpg)
+![image-20230307000406674](https://s2.loli.net/2023/03/07/TC7z2mt3EGMPWfq.png)
 
 可以看到，在连接之后，也会直接同步主节点的数据，因此无论是已经处于从节点状态还是刚刚启动完成的服务器，都会从主节点同步数据，实际上整个同步流程为：
 
@@ -963,11 +963,11 @@ port 6001
 
 当我们的主节点关闭后，从节点依然可以读取数据：
 
-![image-20220413122411006](https://tva1.sinaimg.cn/large/e6c9d24ely1h17z9oo7bdj21ce0majw5.jpg)
+![image-20230307000415001](https://s2.loli.net/2023/03/07/MmNshyQxa2ijSRT.png)
 
 但是从节点会疯狂报错：
 
-![image-20220413122528096](https://tva1.sinaimg.cn/large/e6c9d24ely1h17zb0v187j21he032myo.jpg)
+![image-20230307000424822](https://s2.loli.net/2023/03/07/pEIo93MQXShrsZD.png)
 
 当然每次都去敲个命令配置主从太麻烦了，我们可以直接在配置文件中配置，添加这样行即可：
 
@@ -977,15 +977,15 @@ replicaof 127.0.0.1 6001
 
 这里我们给6002和6003服务器都配置一下，现在我们重启三个服务器。
 
-![image-20220413122848685](https://tva1.sinaimg.cn/large/e6c9d24ely1h17zehyh4pj21hg0d6gu1.jpg)
+![image-20230307000432434](https://s2.loli.net/2023/03/07/GpAa5kfyC3zVRZK.png)
 
 当然，除了作为Master节点的从节点外，我们还可以将其作为从节点的从节点，比如现在我们让6003作为6002的从节点：
 
-![image-20220413123047711](https://tva1.sinaimg.cn/large/e6c9d24ely1h17zgkb251j216e09mq4n.jpg)
+![image-20230307000444990](https://s2.loli.net/2023/03/07/OdAs1weYgkDrQvf.png)
 
 也就是说，现在差不多是这样的的一个情况：
 
-![image-20220413123603650](https://tva1.sinaimg.cn/large/e6c9d24ely1h17zm1h2wpj21ja0ikjv0.jpg)
+![image-20230307000459161](https://s2.loli.net/2023/03/07/2ADSR8LtpMhCFfK.png)
 
 采用这种方式，优点肯定是显而易见的，但是缺点也很明显，整个传播链路一旦中途出现问题，那么就会导致后面的从节点无法及时同步。
 
@@ -995,11 +995,11 @@ replicaof 127.0.0.1 6001
 
 经过之前的学习，我们发现，实际上最关键的还是主节点，因为一旦主节点出现问题，那么整个主从系统将无法写入，因此，我们得想一个办法，处理一下主节点故障的情况。实际上我们可以参考之前的服务治理模式，比如Nacos和Eureka，所有的服务都会被实时监控，那么只要出现问题，肯定是可以及时发现的，并且能够采取响应的补救措施，这就是我们即将介绍的哨兵：
 
-![image-20220413154102800](https://tva1.sinaimg.cn/large/e6c9d24ely1h184yisdi6j218i0dk405.jpg)
+![image-20230307000508084](https://s2.loli.net/2023/03/07/YGq8MDZbRK6E7Po.png)
 
 注意这里的哨兵不是我们之前学习SpringCloud Alibaba的那个，是专用于Redis的。哨兵会对所有的节点进行监控，如果发现主节点出现问题，那么会立即让从节点进行投票，选举一个新的主节点出来，这样就不会由于主节点的故障导致整个系统不可写（注意要实现这样的功能最小的系统必须是一主一从，再小的话就没有意义了）
 
-![image-20220413155459399](https://tva1.sinaimg.cn/large/e6c9d24ely1h185d16octj21940dawg5.jpg)
+![image-20230307000516875](https://s2.loli.net/2023/03/07/WhkUqfxcHn4CApP.png)
 
 那么怎么启动一个哨兵呢？我们只需要稍微修改一下配置文件即可，这里直接删除全部内容，添加：
 
@@ -1009,29 +1009,29 @@ sentinel monitor lbwnb 127.0.0.1 6001 1
 
 其中第一个和第二个是固定，第三个是为监控对象名称，随意，后面就是主节点的相关信息，包括IP地址和端口，最后一个1我们暂时先不说，然后我们使用此配置文件启动服务器，可以看到启动后：
 
-![image-20220413161154185](https://tva1.sinaimg.cn/large/e6c9d24ely1h185umqg2rj21fg0maq8l.jpg)
+![image-20230307000534399](https://s2.loli.net/2023/03/07/xB78t53RgykXvo9.png)
 
-![image-20220413161306103](https://tva1.sinaimg.cn/large/e6c9d24ely1h185vv5uuvj217e03u40p.jpg)
+![image-20230307000542878](https://s2.loli.net/2023/03/07/STh2RgjW7ycPCNB.png)
 
 可以看到以哨兵模式启动后，会自动监控主节点，然后还会显示那些节点是作为从节点存在的。
 
 现在我们直接把主节点关闭，看看会发生什么事情：
 
-![image-20220413161730035](https://tva1.sinaimg.cn/large/e6c9d24ely1h1860g13toj21hg072n1k.jpg)
+![image-20230307000627807](https://s2.loli.net/2023/03/07/97HnwfuNjUK5qx4.png)
 
 可以看到从节点还是正常的在报错，一开始的时候不会直接重新进行选举而是继续尝试重连（因为有可能只是网络小卡一下，没必要这么敏感），但是我们发现，经过一段时间之后，依然无法连接，哨兵输出了以下内容：
 
-![image-20220413161843439](https://tva1.sinaimg.cn/large/e6c9d24ely1h1861pyd5uj21gs0jman3.jpg)
+![image-20230307000646050](https://s2.loli.net/2023/03/07/GWt8Q6mfSv7TgCb.png)
 
 可以看到哨兵发现主节点已经有一段时间不可用了，那么就会开始进行重新选举，6003节点被选为了新的主节点，并且之前的主节点6001变成了新的主节点的从节点：
 
-![image-20220413162259056](https://tva1.sinaimg.cn/large/e6c9d24ely1h18665ksokj21hq05sjuu.jpg)
+![image-20230307000653822](https://s2.loli.net/2023/03/07/4WzTVZ15dMiQ3f8.png)
 
-![image-20220413162310821](https://tva1.sinaimg.cn/large/e6c9d24ely1h1866crze4j21f207kq5f.jpg)
+![image-20230307000703587](https://s2.loli.net/2023/03/07/gGHVvOhBKe9wSEz.png)
 
 当我们再次启动6001时，会发现，它自动变成了6003的从节点，并且会将数据同步过来：
 
-![image-20220413163527235](https://tva1.sinaimg.cn/large/e6c9d24ely1h186j4ul8mj21gu09qq8y.jpg)
+![image-20230307000717002](https://s2.loli.net/2023/03/07/eqLycu8s1rSRtFa.png)
 
 那么，这个选举规则是怎样的呢？是在所有的从节点中随机选取还是遵循某种规则呢？
 
@@ -1047,11 +1047,11 @@ sentinel monitor lbwnb 192.168.0.8 6001 2
 
 这个值实际上代表的是当有几个哨兵认为主节点挂掉时，就判断主节点真的挂掉了
 
-![image-20220413201201051](https://tva1.sinaimg.cn/large/e6c9d24ely1h18csiah4ej21e60b8794.jpg)
+![image-20230307000731297](https://s2.loli.net/2023/03/07/48MNiLJXqmUtvWc.png)
 
 现在我们把6001节点挂掉，看看这三个哨兵会怎么样：
 
-![image-20220413203351360](https://tva1.sinaimg.cn/large/e6c9d24ely1h18df6teykj21h60fk7d0.jpg)
+![image-20230307000741214](https://s2.loli.net/2023/03/07/ajSAhqb5L9Yuorg.png)
 
 可以看到都显示将master切换为6002节点了。
 
@@ -1094,7 +1094,7 @@ public class Main {
 
 因为单机的内存容量最大就那么多，已经没办法再继续扩展了，但是现在又需要存储更多的内容，这时我们就可以让N台机器上的Redis来分别存储各个部分的数据（每个Redis可以存储1/N的数据量），这样就实现了容量的横向扩展。同时每台Redis还可以配一个从节点，这样就可以更好地保证数据的安全性。
 
-![image-20220413211725149](https://tva1.sinaimg.cn/large/e6c9d24ely1h18eoii8ttj21c60homz7.jpg)
+![image-20230307000754039](https://s2.loli.net/2023/03/07/TjCw8DLi1VqYvpZ.png)
 
 那么问题来，现在用户来了一个写入的请求，数据该写到哪个节点上呢？我们来研究一下集群的机制：
 
@@ -1120,53 +1120,53 @@ cluster-enabled yes
 
 然后输入`redis-cli.exe --cluster create --cluster-replicas 1 127.0.0.1:6001 127.0.0.1:6002 127.0.0.1:6003 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003`，这里的`--cluster-replicas 1`指的是每个节点配一个从节点：
 
-![image-20220413215928157](https://tva1.sinaimg.cn/large/e6c9d24ely1h18fw9o0isj21hc0mw12l.jpg)
+![image-20230307000805968](https://s2.loli.net/2023/03/07/7DikHoxKJPve9qa.png)
 
 输入之后，会为你展示客户端默认分配的方案，并且会询问你当前的方案是否合理。可以看到6001/6002/6003都被选为主节点，其他的为从节点，我们直接输入yes即可：
 
-![image-20220413215243309](https://tva1.sinaimg.cn/large/e6c9d24ely1h18fp8r1m9j21h605sabp.jpg)
+![image-20230307000814076](https://s2.loli.net/2023/03/07/yxZhjouXB79qfDd.png)
 
 最后分配成功，可以看到插槽的分配情况：
 
-![image-20220413215958201](https://tva1.sinaimg.cn/large/e6c9d24ely1h18fwsc8ecj21go0li467.jpg)
+![image-20230307000830886](https://s2.loli.net/2023/03/07/8kg9TbadF2qyHJW.png)
 
 现在我们随便连接一个节点，尝试插入一个值：
 
-![image-20220413220609800](https://tva1.sinaimg.cn/large/e6c9d24ely1h18g381vqlj2122030dgk.jpg)
+![image-20230307000840119](https://s2.loli.net/2023/03/07/YMf8DtlkCsqBpO1.png)
 
 在插入时，出现了一个错误，实际上这就是因为a计算出来的哈希值（插槽），不归当前节点管，我们得去管这个插槽的节点执行，通过上面的分配情况，我们可以得到15495属于节点6003管理：
 
-![image-20220413220811536](https://tva1.sinaimg.cn/large/e6c9d24ely1h18g5ccyqpj20y205e3z8.jpg)
+![image-20230307000849127](https://s2.loli.net/2023/03/07/EZmR2bLFudSskIf.png)
 
 在6003节点插入成功，当然我们也可以使用集群方式连接，这样我们无论在哪个节点都可以插入，只需要添加`-c`表示以集群模式访问：
 
-![image-20220413220935678](https://tva1.sinaimg.cn/large/e6c9d24ely1h18g6stccaj216y04uwfk.jpg)
+![image-20230307000907196](https://s2.loli.net/2023/03/07/mVw7EXFJQOcinIb.png)
 
 可以看到，在6001节点成功对a的值进行了更新，只不过还是被重定向到了6003节点进行插入。
 
 我们可以输入`cluster nodes`命令来查看当前所有节点的信息：
 
-![image-20220413222104845](https://tva1.sinaimg.cn/large/e6c9d24ely1h18gir6s5mj21hk09mgs0.jpg)
+![image-20230307000914746](https://s2.loli.net/2023/03/07/pEJdI2UWTcNZFqu.png)
 
 那么现在如果我们让某一个主节点挂掉会怎么样？现在我们把6001挂掉：
 
-![image-20220413223237962](https://tva1.sinaimg.cn/large/e6c9d24ely1h18gurtemjj21h808wwkx.jpg)
+![image-20230307000922277](https://s2.loli.net/2023/03/07/zd6L3WosVE8JUqf.png)
 
 可以看到原本的6001从节点7001，晋升为了新的主节点，而之前的6001已经挂了，现在我们将6001重启试试看：
 
-![image-20220413223337494](https://tva1.sinaimg.cn/large/e6c9d24ely1h18gvstwbkj21hk04e76h.jpg)
+![image-20230307000933812](https://s2.loli.net/2023/03/07/eUfYJS8yhVijvaw.png)
 
 可以看到6001变成了7001的从节点，那么要是6001和7001都挂了呢？
 
-![image-20220413223702884](https://tva1.sinaimg.cn/large/e6c9d24ely1h18gzd1jxzj21ha0460v0.jpg)
+![image-20230307000944827](https://s2.loli.net/2023/03/07/9W2BQtMXrUCnySV.png)
 
 这时我们尝试插入新的数据：
 
-![image-20220413223724440](https://tva1.sinaimg.cn/large/e6c9d24ely1h18gzqibkqj20va03a74o.jpg)
+![image-20230307000953377](https://s2.loli.net/2023/03/07/S8r5TE7gJ3M6iDW.png)
 
 可以看到，当存在节点不可用时，会无法插入新的数据，现在我们将6001和7001恢复：
 
-![image-20220413223813370](https://tva1.sinaimg.cn/large/e6c9d24ely1h18h0l5pcnj21gs07a77z.jpg)
+![image-20230307001001435](https://s2.loli.net/2023/03/07/2RL4GNqSWJXFuME.png)
 
 可以看到恢复之后又可以继续正常使用了。
 
@@ -1220,11 +1220,11 @@ setnx key value
 
 这个命令看起来和`set`命令差不多，但是它有一个机制，就是只有当指定的key不存在的时候，才能进行插入，实际上就是`set if not exists`的缩写。
 
-![image-20220414105646460](https://tva1.sinaimg.cn/large/e6c9d24ely1h192d1jdakj214q07uab5.jpg)
+![image-20230307001013418](https://s2.loli.net/2023/03/07/fNCxEJRX61cPsuk.png)
 
 可以看到，当客户端1设定a之后，客户端2使用`setnx`会直接失败。
 
-![image-20220414105854959](https://tva1.sinaimg.cn/large/e6c9d24ely1h192f9yztfj211g08i75i.jpg)
+![image-20230307001022446](https://s2.loli.net/2023/03/07/wpGutcmxEsWFJVn.png)
 
 当客户端1将a删除之后，客户端2就可以使用`setnx`成功插入了。
 
@@ -1236,19 +1236,19 @@ set a 666 EX 5 NX
 
 这里使用`set`命令，最后加一个NX表示是使用`setnx`的模式，和上面是一样的，但是可以通过EX设定过期时间，这里设置为5秒，也就是说如果5秒还没释放，那么就自动删除。
 
-![image-20220414111008456](https://tva1.sinaimg.cn/large/e6c9d24ely1h192qy0x9pj213w09ymyq.jpg)
+![image-20230307001031311](https://s2.loli.net/2023/03/07/eQEIGKONmkB2u6y.png)
 
 当然，添加了过期时间，带了的好处是显而易见的，但是同时也带来了很多的麻烦，我们来设想一下这种情况：
 
-![image-20220414112359738](https://tva1.sinaimg.cn/large/e6c9d24ely1h1935d9f0jj21im0cydi8.jpg)
+![image-20230307001038169](https://s2.loli.net/2023/03/07/nStuP75RLOmQWUM.png)
 
 因此，单纯只是添加过期时间，会出现这种把别人加的锁谁卸了的情况，要解决这种问题也很简单，我们现在的目标就是保证任务只能删除自己加的锁，如果是别人加的锁是没有资格删的，所以我们可以吧a的值指定为我们任务专属的值，比如可以使用UUID之类的，如果在主动删除锁的时候发现值不是我们当前任务指定的，那么说明可能是因为超时，其他任务已经加锁了。
 
-![image-20220414113041835](https://tva1.sinaimg.cn/large/e6c9d24ely1h193cc7opzj21hy0da40t.jpg)
+![image-20220414113041835](https://s2.loli.net/2023/03/07/4DW1K38UqQJdwkf.jpg)
 
 如果你在学习本篇之前完成了JUC并发编程篇的学习，那么一定会有一个疑惑，如果在超时之前那一刹那进入到释放锁的阶段，获取到值肯定还是自己，但是在即将执行删除之前，由于超时机制导致被删除并且其他任务也加锁了，那么这时再进行删除，仍然会导致删除其他任务加的锁。
 
-![image-20220414113709773](https://tva1.sinaimg.cn/large/e6c9d24ely1h193j2b68fj21mw0d6mzv.jpg)
+![image-20220414113709773](https://s2.loli.net/2023/03/07/8I1Atm7BOZC5ifS.jpg)
 
 实际上本质还是因为锁的超时时间不太好衡量，如果超时时间能够设定地比较恰当，那么就可以避免这种问题了。
 
@@ -1287,7 +1287,7 @@ public static void main(String[] args) {
 
 这里没有直接用`incr`而是我们自己进行计算，方便模拟，可以看到运行结束之后a的值并不是我们想要的：
 
-![image-20220414133258227](https://tva1.sinaimg.cn/large/e6c9d24ely1h196vkaykrj21ce022dft.jpg)
+![image-20220414133258227](https://s2.loli.net/2023/03/07/y2Nvi816ut4jpGC.jpg)
 
 现在我们来给它加一把锁，注意这个锁是基于Redis的，不仅仅只可以用于当前应用，是能够垮系统的：
 
@@ -1315,7 +1315,7 @@ public static void main(String[] args) {
 
 可以看到结果没有问题：
 
-![image-20220414133403403](https://tva1.sinaimg.cn/large/e6c9d24ely1h196wp13naj215202caa3.jpg)
+![image-20220414133403403](https://s2.loli.net/2023/03/07/Gyz1Rc7OWhT5NJK.jpg)
 
 注意，如果用于存放锁的Redis服务器挂了，那么肯定是会出问题的，这个时候我们就可以使用RedLock，它的思路是，在多个Redis服务器上保存锁，只需要超过半数的Redis服务器获取到锁，那么就真的获取到锁了，这样就算挂掉一部分节点，也能保证正常运行，这里就不做演示了。
 
@@ -1331,7 +1331,7 @@ public static void main(String[] args) {
 
 和之前一样，一旦我们实现了主从复制，那么就算主库出现故障，从库也能正常提供服务，并且还可以实现读写分离等操作。这里我们就使用两台主机来搭建一主一从的环境，首先确保两台服务器都安装了MySQL数据库并且都已经正常运行了：
 
-![image-20220414162319865](https://tva1.sinaimg.cn/large/e6c9d24ely1h19bsu4pv1j21zq0dyn3r.jpg)
+![image-20220414162319865](https://s2.loli.net/2023/03/07/95wL8vICYNp61T2.jpg)
 
 接着我们需要创建对应的账号，一会方便从库进行访问的用户：
 
@@ -1372,7 +1372,7 @@ FLUSH PRIVILEGES;
 
 然后我们可以输入命令来查看主库的相关情况：
 
-![image-20220414164943974](https://tva1.sinaimg.cn/large/e6c9d24ely1h19ckapbrsj218206s3zi.jpg)
+![image-20220414164943974](https://s2.loli.net/2023/03/07/kqHZoc8xAbNOd3K.jpg)
 
 这样主库就搭建完成了，接着我们需要将从库进行配置，首先是配置文件：
 
@@ -1392,7 +1392,7 @@ change replication source to SOURCE_HOST='192.168.0.8',SOURCE_USER='test',SOURCE
 
 注意后面的logfile和pos就是我们上面从主库中显示的信息。
 
-![image-20220414170022303](https://tva1.sinaimg.cn/large/e6c9d24ely1h19cvd6eypj218m032my0.jpg)
+![image-20220414170022303](https://s2.loli.net/2023/03/07/H7BIl9s3kPu2Mnw.jpg)
 
 执行完成后，显示OK表示没有问题，接着输入：
 
@@ -1408,13 +1408,13 @@ show replica status\G;
 
 来查看当前从机状态，可以看到：
 
-![image-20220414192045320](https://tva1.sinaimg.cn/large/e6c9d24ely1h19gxft4iwj217i0d4jtm.jpg)
+![image-20220414192045320](https://s2.loli.net/2023/03/07/KiCoVP1cGaf94uX.jpg)
 
 最关键的是下面的Replica_IO_Running和Replica_SQL_Running必须同时为Yes才可以，实际上从库会创建两个线程，一个线程负责与主库进行通信，获取二进制日志，暂时存放到一个中间表（Relay_Log）中，而另一个线程则是将中间表保存的二进制日志的信息进行执行，然后插入到从库中。
 
 最后配置完成，我们来看看在主库进行操作会不会同步到从库：
 
-![image-20220414192508849](https://tva1.sinaimg.cn/large/e6c9d24ely1h19h202nr3j21e00aimyl.jpg)
+![image-20220414192508849](https://s2.loli.net/2023/03/07/RxNB3QmUYESX5ad.jpg)
 
 可以看到在主库中创建的数据库，被同步到从库中了，我们再来试试看创建表和插入数据：
 
@@ -1427,15 +1427,15 @@ create table test  (
 );
 ```
 
-![image-20220414192829536](https://tva1.sinaimg.cn/large/e6c9d24ely1h19h5hpocfj21dg0e8tbe.jpg)
+![image-20220414192829536](https://s2.loli.net/2023/03/07/qKBwz31P6ySxlZt.jpg)
 
 现在我们随便插入一点数据：
 
-![image-20220414192920277](https://tva1.sinaimg.cn/large/e6c9d24ely1h19h6cxnxzj215c08s3zn.jpg)
+![image-20220414192920277](https://s2.loli.net/2023/03/07/9pqBFXiLhTPc2xO.jpg)
 
 这样，我们的MySQL主从就搭建完成了，那么如果主机此时挂了会怎么样？
 
-![image-20220414200140191](https://tva1.sinaimg.cn/large/e6c9d24ely1h19i41l2flj211k03oq3b.jpg)
+![image-20220414200140191](https://s2.loli.net/2023/03/07/s1Q5xt32r6dv9UJ.jpg)
 
 可以看到IO线程是处于重连状态，会等待主库重新恢复运行。
 
@@ -1447,21 +1447,21 @@ create table test  (
 
 那么问题来了，怎么个分散法？
 
-* **垂直拆分：**我们的表和数据库都可以进行垂直拆分，所谓垂直拆分，就是将数据库中所有的表，按照业务功能拆分到各个数据库中（是不是感觉跟前面两章的学习的架构对应起来了）而对于一张表，也可以通过外键之类的机制，将其拆分为多个表。
+* **垂直拆分：** 我们的表和数据库都可以进行垂直拆分，所谓垂直拆分，就是将数据库中所有的表，按照业务功能拆分到各个数据库中（是不是感觉跟前面两章的学习的架构对应起来了）而对于一张表，也可以通过外键之类的机制，将其拆分为多个表。
 
-  ![image-20220414204703883](https://tva1.sinaimg.cn/large/e6c9d24ely1h19jf8adocj21e60gyacl.jpg)
+  ![image-20220414204703883](https://s2.loli.net/2023/03/07/mnJO4hBwDAkRcMi.jpg)
 
-* **水平拆分：**水平拆分针对的不是表，而是数据，我们可以让很多个具有相同表的数据库存放一部分数据，相当于是将数据分散存储在各个节点上。
+* **水平拆分：** 水平拆分针对的不是表，而是数据，我们可以让很多个具有相同表的数据库存放一部分数据，相当于是将数据分散存储在各个节点上。
 
-  ![image-20220414205222383](https://tva1.sinaimg.cn/large/e6c9d24ely1h19jkrb2pkj21g80eu76c.jpg)
+  ![image-20220414205222383](https://s2.loli.net/2023/03/07/AdS5hrH2O1l8iqv.jpg)
 
 那么要实现这样的拆分操作，我们自行去编写代码工作量肯定是比较大的，因此目前实际上已经有一些解决方案了，比如我们可以使用MyCat（也是一个数据库中间件，相当于挂了一层代理，再通过MyCat进行分库分表操作数据库，只需要连接就能使用，类似的还有ShardingSphere-Proxy）或是Sharding JDBC（应用程序中直接对SQL语句进行分析，然后转换成分库分表操作，需要我们自己编写一些逻辑代码），这里我们就讲解一下Sharding JDBC。
 
 ### Sharding JDBC
 
-![image-20220414214856875](https://tva1.sinaimg.cn/large/e6c9d24ely1h19l7msxooj21ps0iego7.jpg)
+![image-20220414214856875](https://s2.loli.net/2023/03/07/HTlcExgCfZvG9MP.jpg)
 
-**官方文档（中文）：**https://shardingsphere.apache.org/document/5.1.0/cn/overview/#shardingsphere-jdbc
+**官方文档（中文）：** https://shardingsphere.apache.org/document/5.1.0/cn/overview/#shardingsphere-jdbc
 
 定位为轻量级 Java 框架，在 Java 的 JDBC 层提供的额外服务，它使用客户端直连数据库，以 jar 包形式提供服务，无需额外部署和依赖，可理解为增强版的 JDBC 驱动，完全兼容 JDBC 和各种 ORM 框架。
 
@@ -1516,7 +1516,7 @@ FLUSH PRIVILEGES;
 
 接着我们来看，如果直接尝试开启服务器，那肯定是开不了的，因为我们要配置数据源：
 
-![image-20220414212443482](https://tva1.sinaimg.cn/large/e6c9d24ely1h19kif2dh4j21sk08en0j.jpg)
+![image-20220414212443482](https://s2.loli.net/2023/03/07/GEfPLSIZyobhtTe.jpg)
 
 那么数据源该怎么配置呢？现在我们是一个分库分表的状态，需要配置两个数据源：
 
@@ -1546,7 +1546,7 @@ spring:
 
 如果启动没有问题，那么就是配置成功了：
 
-![image-20220414222958901](https://tva1.sinaimg.cn/large/e6c9d24ely1h19mebpqb7j21su0aqgre.jpg)
+![image-20220414222958901](https://s2.loli.net/2023/03/07/Hvm82dfbEtwBqrA.jpg)
 
 接着我们需要对项目进行一些编写，添加我们的用户实体类和Mapper：
 
@@ -1632,15 +1632,15 @@ class ShardingJdbcTestApplicationTests {
 
 现在我们可以开始运行了：
 
-![image-20220415104401263](https://tva1.sinaimg.cn/large/e6c9d24ely1h1a7m3cjm6j21qe0b6aej.jpg)
+![image-20220415104401263](https://s2.loli.net/2023/03/07/7oBrFRwiXQxcumz.jpg)
 
 测试通过，我们来看看数据库里面是不是按照我们的规则进行数据插入的：
 
-![image-20220415104449502](https://tva1.sinaimg.cn/large/e6c9d24ely1h1a7mx6u30j217g0d075w.jpg)
+![image-20220415104449502](https://s2.loli.net/2023/03/07/kZINi9wmnte3J7g.jpg)
 
 可以看到这两张表，都成功按照我们指定的路由规则进行插入了，我们来看看详细的路由情况，通过控制台输出的SQL就可以看到：
 
-![image-20220415105325917](https://tva1.sinaimg.cn/large/e6c9d24ely1h1a7vvcqsij21g20amgpd.jpg)
+![image-20220415105325917](https://img-blog.csdnimg.cn/img_convert/2e9cd91031d3fc7d2f11a2f59d8841ae.png)
 
 可以看到所有的SQL语句都有一个Logic SQL（这个就是我们在Mybatis里面写的，是什么就是什么）紧接着下面就是Actual SQL，也就是说每个逻辑SQL最终会根据我们的策略转换为实际SQL，比如第一条数据，它的id是0，那么实际转换出来的SQL会在db0这个数据源进行插入。
 
@@ -1648,8 +1648,8 @@ class ShardingJdbcTestApplicationTests {
 
 分库完成之后，接着我们来看分表，比如现在我们的数据库中有`test_0`和`test_1`两张表，表结构一样，但是我们也是希望能够根据id取模运算的结果分别放到这两个不同的表中，实现思路其实是差不多的，这里首先需要介绍一下两种表概念：
 
-* **逻辑表：**相同结构的水平拆分数据库（表）的逻辑名称，是 SQL 中表的逻辑标识。 例：订单数据根据主键尾数拆分为 10 张表，分别是 `t_order_0` 到 `t_order_9`，他们的逻辑表名为 `t_order`
-* **真实表：**在水平拆分的数据库中真实存在的物理表。 即上个示例中的 `t_order_0` 到 `t_order_9`
+* **逻辑表：** 相同结构的水平拆分数据库（表）的逻辑名称，是 SQL 中表的逻辑标识。 例：订单数据根据主键尾数拆分为 10 张表，分别是 `t_order_0` 到 `t_order_9`，他们的逻辑表名为 `t_order`
+* **真实表：** 在水平拆分的数据库中真实存在的物理表。 即上个示例中的 `t_order_0` 到 `t_order_9`
 
 现在我们就以一号数据库为例，那么我们在里面创建上面提到的两张表，之前的那个`test`表删不删都可以，就当做不存在就行了：
 
@@ -1667,7 +1667,7 @@ create table test_1  (
 );
 ```
 
-![image-20220415110322981](https://tva1.sinaimg.cn/large/e6c9d24ely1h1a8681w2ej211608u3z0.jpg)
+![image-20220415110322981](https://s2.loli.net/2023/03/07/InHsNXA3E8dQBPa.jpg)
 
 接着我们不要去修改任何的业务代码，Mybatis里面写的是什么依然保持原样，即使我们的表名已经变了，我们需要做的是通过路由来修改原有的SQL，配置如下：
 
@@ -1701,11 +1701,11 @@ spring:
 
 现在我们来测试一下，看看会不会按照我们的策略进行分表插入：
 
-![image-20220415112809843](https://tva1.sinaimg.cn/large/e6c9d24ely1h1a8w0j0ubj21q80bkgq4.jpg)
+![image-20220415112809843](https://s2.loli.net/2023/03/07/OaRCMTJ1lnIicSd.jpg)
 
 可以看到，根据我们的算法，原本的逻辑表被修改为了最终进行分表计算后的结果，我们来查看一下数据库：
 
-![image-20220415112908760](https://tva1.sinaimg.cn/large/e6c9d24ely1h1a8x1l1coj21800lqgnj.jpg)
+![image-20220415112908760](https://s2.loli.net/2023/03/07/lfvgOjanPZHMNdr.jpg)
 
 插入我们了解完毕了，我们来看看查询呢：
 
@@ -1725,7 +1725,7 @@ class ShardingJdbcTestApplicationTests {
 }
 ```
 
-![image-20220415113139917](https://tva1.sinaimg.cn/large/e6c9d24ely1h1a8znk6tuj21j408uacr.jpg)
+![image-20220415113139917](https://s2.loli.net/2023/03/07/7K1WBk3s8HuMeOI.jpg)
 
 可以看到，根据我们配置的策略，查询也会自动选择对应的表进行，是不是感觉有内味了。
 
@@ -1753,7 +1753,7 @@ class ShardingJdbcTestApplicationTests {
 
 我们来看看执行结果会怎么样：
 
-![image-20220415113530971](https://tva1.sinaimg.cn/large/e6c9d24ely1h1a93ntucij21qa07wwim.jpg)
+![image-20220415113530971](https://s2.loli.net/2023/03/07/3Hj7s4xqEwiFXJB.jpg)
 
 可以看到INLINE算法默认是不支持进行全量查询的，我们得将上面的配置项改成true：
 
@@ -1763,7 +1763,7 @@ allow-range-query-with-inline-sharding: true
 
 再次进行测试：
 
-![image-20220415113652038](https://tva1.sinaimg.cn/large/e6c9d24ely1h1a952ev2ej21rq04wwg8.jpg)
+![image-20220415113652038](https://s2.loli.net/2023/03/07/WoQqNLCXJslBT3D.jpg)
 
 可以看到，最终出来的SQL语句是直接对两个表都进行查询，然后求出一个并集出来作为最后的结果。
 
@@ -1782,7 +1782,7 @@ allow-range-query-with-inline-sharding: true
 
 那么我们在分布式系统下，如何保证ID的生成满足上面的需求呢？
 
-1. **使用UUID：**UUID是由一组32位数的16进制数字随机构成的，我们可以直接使用JDK为我们提供的UUID类来创建：
+1. **使用UUID：** UUID是由一组32位数的16进制数字随机构成的，我们可以直接使用JDK为我们提供的UUID类来创建：
 
    ```java
    public static void main(String[] args) {
@@ -1795,11 +1795,11 @@ allow-range-query-with-inline-sharding: true
 
    但是它并不满足我们上面的第二个要求，也就是说我们需要尽可能的保证有序，而这里我们得到的都是一些无序的ID。
 
-2. **雪花算法（Snowflake）：**
+2. **雪花算法（Snowflake）：** 
 
    我们来看雪花算法，它会生成一个一个64bit大小的整型的ID，int肯定是装不下了。
 
-   ![image-20220415150713707](https://tva1.sinaimg.cn/large/e6c9d24ely1h1af7y9xpyj213609kwf6.jpg)
+   ![image-20220415150713707](https://s2.loli.net/2023/03/07/lU9A4zjSIKvaxwh.jpg)
 
    可以看到它主要是三个部分组成，时间+工作机器ID+序列号，时间以毫秒为单位，41个bit位能表示约70年的时间，时间纪元从2016年11月1日零点开始，可以使用到2086年，工作机器ID其实就是节点ID，每个节点的ID都不相同，那么就可以区分出来，10个bit位可以表示最多1024个节点，最后12位就是每个节点下的序列号，因此每台机器每毫秒就可以有4096个系列号。
 
@@ -1875,7 +1875,7 @@ class ShardingJdbcTestApplicationTests {
 
 可以看到日志：
 
-![image-20220415154524545](https://tva1.sinaimg.cn/large/e6c9d24ely1h1agbo7cqhj21fi0ein3c.jpg)
+![image-20220415154524545](https://s2.loli.net/2023/03/07/2JBaqnV8k9OWYfw.jpg)
 
 在插入的时候，将我们的SQL语句自行添加了一个id字段，并且使用的是雪花算法生成的值，并且也是根据我们的分库策略在进行插入操作。
 
@@ -1883,7 +1883,7 @@ class ShardingJdbcTestApplicationTests {
 
 最后我们来看看读写分离，我们之前实现了MySQL的主从，那么我们就可以将主库作为读，从库作为写：
 
-![image-20220415155842834](https://tva1.sinaimg.cn/large/e6c9d24ely1h1agpivkf5j21og0ge76c.jpg)
+![image-20220415155842834](https://s2.loli.net/2023/03/07/KRBbGXxhkmUHFIr.jpg)
 
 这里我们还是将数据库变回主从状态，直接删除当前的表，我们重新来过：
 
@@ -1905,7 +1905,7 @@ sudo systemctl restart mysql.service
 
 然后进入主库，看看状态：
 
-![image-20220415160249024](https://tva1.sinaimg.cn/large/e6c9d24ely1h1agtsg7urj217k07s0tx.jpg)
+![image-20220415160249024](https://s2.loli.net/2023/03/07/8o4YIB5MysaUuFx.jpg)
 
 现在我们配置一下从库：
 
@@ -1972,8 +1972,13 @@ class ShardingJdbcTestApplicationTests {
 
 运行看看SQL日志：
 
-![image-20220415162741466](https://tva1.sinaimg.cn/large/e6c9d24ely1h1ahjo682tj21je07udik.jpg)
+![image-20220415162741466](https://s2.loli.net/2023/03/07/zJvqKmfyhVMFLtZ.jpg)
 
 可以看到，当我们执行插入操作时，会直接向db0进行操作，而读取操作是会根据我们的配置，选择db1进行操作。
 
 至此，微服务应用章节到此结束。
+
+
+————————————————
+版权声明：本文为柏码知识库版权所有，禁止一切未经授权的转载、发布、出售等行为，违者将被追究法律责任。
+原文链接：https://www.itbaima.cn/document/35v1hbsfcdgagdnw

@@ -1,14 +1,14 @@
-![image-20220326001448808](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ml18j1h6j21v40lkgob.jpg)
+![image-20230306230950443](https://s2.loli.net/2023/03/06/V1dFqQMR7T2GzSJ.png)
 
 # 微服务进阶
 
 前面我们了解了微服务的一套解决方案，但是它是基于Netflix的解决方案，实际上我们发现，很多框架都已经停止维护了，来看看目前我们所认识到的SpringCloud各大组件的维护情况：
 
-* **注册中心：**Eureka（属于*Netflix*，2.x版本不再开源，1.x版本仍在更新）
-* **服务调用：**Ribbon（属于*Netflix*，停止更新，已经彻底被移除）、SpringCloud Loadbalancer（属于*SpringCloud*官方，目前的默认方案）
-* **服务降级：**Hystrix（属于*Netflix*，停止更新，已经彻底被移除）
-* **路由网关：**Zuul（属于*Netflix*，停止更新，已经彻底被移除）、Gateway（属于*SpringCloud*官方，推荐方案）
-* **配置中心：**Config（属于*SpringCloud*官方）
+* **注册中心：** Eureka（属于*Netflix*，2.x版本不再开源，1.x版本仍在更新）
+* **服务调用：** Ribbon（属于*Netflix*，停止更新，已经彻底被移除）、SpringCloud Loadbalancer（属于*SpringCloud*官方，目前的默认方案）
+* **服务降级：** Hystrix（属于*Netflix*，停止更新，已经彻底被移除）
+* **路由网关：** Zuul（属于*Netflix*，停止更新，已经彻底被移除）、Gateway（属于*SpringCloud*官方，推荐方案）
+* **配置中心：** Config（属于*SpringCloud*官方）
 
 可见，我们之前使用的整套解决方案中，超过半数的组件都已经处于不可用状态，并且部分组件都是SpringCloud官方出手提供框架进行解决，因此，寻找一套更好的解决方案势在必行，也就引出了我们本章的主角：**SpringCloud Alibaba**
 
@@ -36,7 +36,7 @@
 
 ***
 
-![image-20220326110940692](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n3ym3j2sj20pg02qa9x.jpg)
+![image-20230306230942876](https://s2.loli.net/2023/03/06/pQkSrLx9NZRn8Ub.png)
 
 ## Nacos 更加全能的注册中心
 
@@ -46,17 +46,17 @@ Nacos（**Na**ming **Co**nfiguration **S**ervice）是一款阿里巴巴开源�
 
 Nacos服务器是独立安装部署的，因此我们需要下载最新的Nacos服务端程序，下载地址：https://github.com/alibaba/nacos，连不上可以到视频下方云盘中下载。
 
-![image-20220326125206549](https://tva1.sinaimg.cn/large/e6c9d24egy1h0n6x7gxp1j22qs0ms0x0.jpg)
+![image-20230306231045825](https://s2.loli.net/2023/03/06/VStPIABaXxMp2N9.png)
 
 可以看到目前最新的版本是`1.4.3`版本（2022年2月27日发布的），我们直接下载`zip`文件即可。
 
 接着我们将文件进行解压，得到以下内容：
 
-![image-20220326125854416](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n749lottj215a08swfh.jpg)
+![image-20230306231054919](https://s2.loli.net/2023/03/06/wWbuXRGizrQCT8J.png)
 
 我们直接将其拖入到项目文件夹下，便于我们一会在IDEA内部启动，接着添加运行配置：
 
-![image-20220326130340573](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n798coaxj226a0i279d.jpg)
+![image-20230306231104823](https://s2.loli.net/2023/03/06/bM8doEZPth7DHfe.png)
 
 其中`-m standalone`表示单节点模式，Mac和Linux下记得将解释器设定为`/bin/bash`，由于Nacos在Mac/Linux默认是后台启动模式，我们修改一下它的bash文件，让它变成前台启动，这样IDEA关闭了Nacos就自动关闭了，否则开发环境下很容易忘记关：
 
@@ -68,15 +68,15 @@ $JAVA ${JAVA_OPT} nacos.nacos
 
 接着我们点击启动：
 
-![image-20220326132051779](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n7r3rhzqj22o80jw0wb.jpg)
+![image-20230306231113946](https://s2.loli.net/2023/03/06/O3pMSvDbxPKYT5q.png)
 
 OK，启动成功，可以看到它的管理页面地址也是给我们贴出来了： http://localhost:8848/nacos/index.html，访问这个地址：
 
-![image-20220326132157126](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n7s92e4jj21lh0u0whw.jpg)
+![image-20230306231125828](https://s2.loli.net/2023/03/06/sbKTUqhLViIfrmR.png)
 
 默认的用户名和管理员密码都是`nacos`，直接登陆即可，可以看到进入管理页面之后功能也是相当丰富：
 
-![image-20220326132455674](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n7vcjn7oj22mg0p6dj0.jpg)
+![image-20230306231150574](https://s2.loli.net/2023/03/06/dom3WpJsiajgCE7.png)
 
 至此，Nacos的安装与部署完成。
 
@@ -147,11 +147,11 @@ spring:
 
 接着启动我们的图书服务，可以在Nacos的服务列表中找到：
 
-![image-20220326140130226](https://tva1.sinaimg.cn/large/e6c9d24egy1h0n8xfhqcaj22lw0egdih.jpg)
+![image-20230306231202683](https://s2.loli.net/2023/03/06/9PLBGOXoaERnUwM.png)
 
 按照同样的方法，我们接着将另外两个服务也注册到Nacos中：
 
-![image-20220326140618708](https://tva1.sinaimg.cn/large/e6c9d24egy1h0n92f2wthj22d00ckdi1.jpg)
+![image-20230306231211930](https://s2.loli.net/2023/03/06/K6VBtqEWSLnMp21.png)
 
 接着我们使用OpenFeign，实现服务发现远程调用以及负载均衡，导入依赖：
 
@@ -225,11 +225,11 @@ public class BorrowApplication {
 
 接着我们进行测试：
 
-![image-20220326142331199](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n9kaxje1j228c074q4h.jpg)
+![image-20230306231226300](https://s2.loli.net/2023/03/06/HIGvXAad1EOVPt6.png)
 
 测试正常，可以自动发现服务，接着我们来多配置几个实例，去掉图书服务和用户服务的端口配置：
 
-![image-20220326142751398](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n9otepuuj21lk0lin0g.jpg)
+![image-20230306231234119](https://s2.loli.net/2023/03/06/WZGdJ5BYpmbMuNT.png)
 
 然后我们在图书服务和用户服务中添加一句打印方便之后查看：
 
@@ -242,23 +242,23 @@ public User findUserById(@PathVariable("uid") int uid){
 ```
 
 现在将全部服务启动：
-![image-20220326142953904](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n9qxup53j223g0eqaix.jpg)
+![image-20230306231244149](https://s2.loli.net/2023/03/06/GCrm8wgWXLzYhtK.png)
 
 可以看到Nacos中的实例数量已经显示为`2`：
 
-![image-20220326143017054](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n9rc8v0wj22cg0g6goj.jpg)
+![image-20230306231251732](https://s2.loli.net/2023/03/06/p6iYrPa8e1btZkl.png)
 
 接着我们调用借阅服务，看看能否负载均衡远程调用：
 
-![image-20220326143058939](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n9s2ioeqj225o07ytaa.jpg)
+![image-20230306231259820](https://s2.loli.net/2023/03/06/jCl8RGhaIiUDBgm.png)
 
-![image-20220326143122333](https://tva1.sinaimg.cn/large/e6c9d24ely1h0n9sh0wr0j21x20gswne.jpg)
+![image-20230306231306653](https://s2.loli.net/2023/03/06/2bWdfmnVOyGzlZr.png)
 
 OK，负载均衡远程调用没有问题，这样我们就实现了基于Nacos的服务的注册与发现，实际上大致流程与Eureka一致。
 
 值得注意的是，Nacos区分了临时实例和非临时实例：
 
-![image-20220326155010841](https://tva1.sinaimg.cn/large/e6c9d24ely1h0nc2h4gy2j22ay072q44.jpg)
+![image-20230306231317971](https://s2.loli.net/2023/03/06/cF5MoVX6vNnzx9j.png)
 
 那么临时和非临时有什么区别呢？
 
@@ -281,11 +281,11 @@ spring:
 
 接着我们在Nacos中查看，可以发现实例已经不是临时的了：
 
-![image-20220326155554821](https://tva1.sinaimg.cn/large/e6c9d24ely1h0nc8g1llrj22be06iq3y.jpg)
+![image-20230306231328378](https://s2.loli.net/2023/03/06/FdRTjlKszDoOPU3.png)
 
 如果这时我们关闭此实例，那么会变成这样：
 
-![image-20220326155633190](https://tva1.sinaimg.cn/large/e6c9d24ely1h0nc93w8zlj22bq06mmy5.jpg)
+![image-20230306231337931](https://s2.loli.net/2023/03/06/R5Jyhl29UcvuOCb.png)
 
 只是将健康状态变为false，而不会删除实例的信息。
 
@@ -305,11 +305,11 @@ eureka:
 
 在一个分布式应用中，相同服务的实例可能会在不同的机器、位置上启动，比如我们的用户管理服务，可能在成都有1台服务器部署、重庆有一台服务器部署，而这时，我们在成都的服务器上启动了借阅服务，那么如果我们的借阅服务现在要调用用户服务，就应该优先选择同一个区域的用户服务进行调用，这样会使得响应速度更快。
 
-![image-20220326150024118](https://tva1.sinaimg.cn/large/e6c9d24ely1h0namonso5j21em0bcgnr.jpg)
+![image-20230306231411711](https://s2.loli.net/2023/03/06/szyGRrEfZ1KWmpj.png)
 
 因此，我们可以对部署在不同机房的服务进行分区，可以看到实例的分区是默认：
 
-![image-20220326150136538](https://tva1.sinaimg.cn/large/e6c9d24ely1h0nanxl0kkj22cm0hawh5.jpg)
+![image-20230306231402008](https://s2.loli.net/2023/03/06/wlO9dQ1NtKCxFTi.png)
 
 我们可以直接在配置文件中进行修改：
 
@@ -327,11 +327,11 @@ spring:
 
 当然由于我们这里使用的是不同的启动配置，直接在启动配置中添加环境变量`spring.cloud.nacos.discovery.cluster-name`也行，这里我们将用户服务和图书服务两个区域都分配一个，借阅服务就配置为成都地区：
 
-![image-20220326150518357](https://tva1.sinaimg.cn/large/e6c9d24ely1h0nars805bj216c08ot9x.jpg)
+![image-20230306231435388](https://s2.loli.net/2023/03/06/cwIhdCMmATELvlN.png)
 
 修改完成之后，我们来尝试重新启动一下（Nacos也要重启），观察Nacos中集群分布情况：
 
-![image-20220326150956937](https://tva1.sinaimg.cn/large/e6c9d24ely1h0nawm1jraj22ck0u0wij.jpg)
+![image-20230306231443247](https://s2.loli.net/2023/03/06/jrYo3epaLMyQnu4.png)
 
 可以看到现在有两个集群，并且都有一个实例正在运行。我们接着去调用借阅服务，但是发现并没有按照区域进行优先调用，而依然使用的是轮询模式的负载均衡调用。
 
@@ -354,13 +354,13 @@ spring:
 
 现在我们重启借阅服务，会发现优先调用的是同区域的用户和图书服务，现在我们可以将成都地区的服务下线：
 
-![image-20220326153002500](https://tva1.sinaimg.cn/large/e6c9d24ely1h0nbhisubdj22d20ekjtk.jpg)
+![image-20230306231453470](https://s2.loli.net/2023/03/06/s1ko9UcD4mMQ5fW.png)
 
 可以看到，在下线之后，由于本区域内没有可用服务了，借阅服务将会调用重庆区域的用户服务。
 
 除了根据区域优先调用之外，同一个区域内的实例也可以单独设置权重，Nacos会优先选择权重更大的实例进行调用，我们可以直接在管理页面中进行配置：
 
-![image-20220326152659294](https://tva1.sinaimg.cn/large/e6c9d24ely1h0nbecloluj22co0n841e.jpg)
+![image-20230306231500731](https://s2.loli.net/2023/03/06/1pAckEZN5ltXKWG.png)
 
 或是在配置文件中进行配置：
 
@@ -385,15 +385,15 @@ spring:
 
 实际上我们可以在`bootstrap.yml`中配置远程配置文件获取，然后再进入到配置文件加载环节，而Nacos也支持这样的操作，使用方式也比较类似，比如我们现在想要将借阅服务的配置文件放到Nacos进行管理，那么这个时候就需要在Nacos中创建配置文件：
 
-![image-20220326161111523](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ncoc8fwqj22mq0gidi8.jpg)
+![image-20230306231534251](https://s2.loli.net/2023/03/06/6j2pAmdfyIGz9Cu.png)
 
 将借阅服务的配置文件全部（当然正常情况下是不会全部CV的，只会复制那些需要经常修改的部分，这里为了省事就直接全部CV了）复制过来，注意**Data ID**的格式跟我们之前一样，`应用名称-环境.yml`，如果只编写应用名称，那么代表此配置文件无论在什么环境下都会使用，然后每个配置文件都可以进行分组，也算是一种分类方式：
 
-![image-20220326162108899](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ncyoyq7ij21sw0u0n0o.jpg)
+![image-20230306231514151](https://s2.loli.net/2023/03/06/7ACoW3txIsjLzu2.png)
 
 完成之后点击发布即可：
 
-![image-20220326162122134](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ncyx3tjnj22cs0bedhs.jpg)
+![image-20230306231522828](https://s2.loli.net/2023/03/06/alFpWGfNejImQEw.png)
 
 然后在项目中导入依赖：
 
@@ -429,7 +429,7 @@ spring:
 
 现在我们启动服务试试看：
 
-![image-20220326163449032](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ndcx7e8sj22lw0eiwlz.jpg)
+![image-20230306231605960](https://s2.loli.net/2023/03/06/5J4FfMgtGwZhP3C.png)
 
 可以看到成功读取配置文件并启动了，实际上使用上来说跟之前的Config是基本一致的。
 
@@ -451,23 +451,23 @@ public class TestController {
 
 我们修改一下配置文件，然后重启服务器：
 
-![image-20220326164209154](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ndkk16naj22bs0lstc8.jpg)
+![image-20230306231616512](https://s2.loli.net/2023/03/06/9xthuBpgFs4PTSq.png)
 
 可以看到已经可以正常读取了：
 
-![image-20220326164306032](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ndljhdc8j217e06it93.jpg)
+![image-20230306231626447](https://s2.loli.net/2023/03/06/kacrSVGYMpwK2jx.png)
 
 现在我们将配置文件的值进行修改：
 
-![image-20220326164531412](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ndo2g2ouj210e04mmxb.jpg)
+![image-20230306231634007](https://s2.loli.net/2023/03/06/YLC2H6yGoVi5z1f.png)
 
 再次访问接口，会发现没有发生变化：
 
-![image-20220326164549862](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ndodjuhkj2126068jrq.jpg)
+![image-20230306231641913](https://s2.loli.net/2023/03/06/isTaOUQwMVWGCY9.png)
 
 但是后台是成功检测到值更新了，但是值却没改变：
 
-![image-20220326164645791](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ndpco63fj222e03cq4n.jpg)
+![image-20230306231656905](https://s2.loli.net/2023/03/06/dR4thB5JTk1cGjm.png)
 
 那么如何才能实现配置热更新呢？我们可以像下面这样：
 
@@ -492,15 +492,15 @@ public class TestController {
 
 我们还可以将配置文件或是服务实例划分到不同的命名空间中，其实就是区分开发、生产环境或是引用归属之类的：
 
-![image-20220326172756819](https://tva1.sinaimg.cn/large/e6c9d24ely1h0new72nlcj22ci0bat9o.jpg)
+![image-20230306231706215](https://s2.loli.net/2023/03/06/7itUIhz3NupRdr6.png)
 
 这里我们创建一个新的命名空间：
 
-![image-20220326173744551](https://tva1.sinaimg.cn/large/e6c9d24ely1h0nf6e5ml4j22aa0j875n.jpg)
+![image-20230306231713676](https://s2.loli.net/2023/03/06/DC2I1MvVFjYmPEq.png)
 
 可以看到在dev命名空间下，没有任何配置文件和服务：
 
-![image-20220326175340892](https://tva1.sinaimg.cn/large/e6c9d24ely1h0nfmz4j3gj22mq0j6gom.jpg)
+![image-20230306231723164](https://s2.loli.net/2023/03/06/Ek4APjgGcqbitNm.png)
 
 我们在不同的命名空间下，实例和配置都是相互之间隔离的，我们也可以在配置文件中指定当前的命名空间。
 
@@ -512,7 +512,7 @@ public class TestController {
 
 官方方案：https://nacos.io/zh-cn/docs/cluster-mode-quick-start.html
 
-![deployDnsVipMode.jpg](https://nacos.io/img/deployDnsVipMode.jpg)
+![deployDnsVipMode.jpg](https://s2.loli.net/2023/03/06/H1AvxOK78yspP5k.jpg)
 
 >http://ip1:port/openAPI 直连ip模式，机器挂则需要修改ip才可以使用。
 >
@@ -528,21 +528,21 @@ public class TestController {
 
 最后就是Nacos的数据存储模式，在单节点的情况下，Nacos实际上是将数据存放在自带的一个嵌入式数据库中：
 
-![image-20220326222343802](https://tva1.sinaimg.cn/large/e6c9d24ely1h0nng0ithgj215i0b875m.jpg)
+![image-20230306231744022](https://s2.loli.net/2023/03/06/Fuxq9Dl3rGfnTZA.png)
 
 而这种模式只适用于单节点，在多节点集群模式下，肯定是不能各存各的，所以，Nacos提供了MySQL统一存储支持，我们只需要让所有的Nacos服务器连接MySQL进行数据存储即可，官方也提供好了SQL文件。
 
 现在就可以开始了，第一步，我们直接导入数据库即可，文件在conf目录中：
 
-![image-20220326222728745](https://tva1.sinaimg.cn/large/e6c9d24egy1h0nnjw4980j2154090jtf.jpg)
+![image-20230306231753589](https://s2.loli.net/2023/03/06/97suBpfdeF54rc2.png)
 
 我们来将其导入到数据库，可以看到生成了很多的表：
 
-![image-20220326222957239](https://tva1.sinaimg.cn/large/e6c9d24egy1h0nnmgm3g0j21580cqgod.jpg)
+![image-20230306231802722](https://s2.loli.net/2023/03/06/cf76RJ9VUiQBlje.png)
 
 然后我们来创建两个Nacos服务器，做一个迷你的集群，这里使用`scp`命令将nacos服务端上传到Linux服务器（注意需要提前安装好JRE 8或更高版本的环境）：
 
-![image-20220327115901662](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ob09uny0j21880303z6.jpg)
+![image-20230306231811912](https://s2.loli.net/2023/03/06/RW4JIBKVXSbG3lZ.png)
 
 解压之后，我们对其配置文件进行修改，首先是`application.properties`配置文件，修改以下内容，包括MySQL服务器的信息：
 
@@ -565,23 +565,23 @@ db.password.0=nacos
 
 然后修改集群配置，这里需要重命名一下：
 
-![image-20220327120219022](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ob3otjt5j20yc01iglw.jpg)
+![image-20230306231821488](https://s2.loli.net/2023/03/06/2pe51dHQsJkPVY7.png)
 
 端口记得使用内网IP地址：
 
-![image-20220327142541523](https://tva1.sinaimg.cn/large/e6c9d24ely1h0of8v91lzj211y05mjrr.jpg)
+![image-20230306231828707](https://s2.loli.net/2023/03/06/5CbEGQ7rX2StUkR.png)
 
 最后我们修改一下Nacos的内存分配以及前台启动，直接修改`startup.sh`文件（内存有限，玩不起高的）：
 
-![image-20220327125049013](https://tva1.sinaimg.cn/large/e6c9d24ely1h0oci5kyrzj218m0acn0i.jpg)
+![image-20230306231836711](https://s2.loli.net/2023/03/06/kQF3lN24vcBqzDi.png)
 
 保存之后，将nacos复制一份，并将端口修改为8802，接着启动这两个Nacos服务器。
 
-![image-20220327125201913](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ocjew7soj218408ktb8.jpg)
+![image-20230306231845850](https://s2.loli.net/2023/03/06/PQYi69aKZUXrNlJ.png)
 
 然后我们打开管理面板，可以看到两个节点都已经启动了：
 
-![image-20220327125232238](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ocjy2a7dj22mo0j6jtq.jpg)
+![image-20230306231854072](https://s2.loli.net/2023/03/06/Lbf14V39SCdghvO.png)
 
 这样，我们第二步就完成了，接着我们需要添加一个SLB，这里我们用Nginx做反向代理：
 
@@ -595,7 +595,7 @@ db.password.0=nacos
 
 可以看到直接请求80端口之后得到，表示安装成功：
 
-![image-20220327130009391](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ocrv94q3j22mi0eidi8.jpg)
+![image-20230306231903833](https://s2.loli.net/2023/03/06/gVuMlAXcY34Ka2C.png)
 
 现在我们需要让其代理我们刚刚启动的两个Nacos服务器，我们需要对其进行一些配置。配置文件位于`/etc/nginx/nginx.conf`，添加以下内容：
 
@@ -618,21 +618,21 @@ server {
 
 重启Nginx服务器，成功连接：
 
-![image-20220327144441878](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ofsnlufwj21wa0u0wis.jpg)
+![image-20230306231912734](https://s2.loli.net/2023/03/06/2hrxcizHPvSq8be.png)
 
 然后我们将所有的服务全部修改为云服务器上Nacos的地址，启动试试看。
 
-![image-20220327145216771](https://tva1.sinaimg.cn/large/e6c9d24ely1h0og0j7z8dj22mg0l0gpk.jpg)
+![image-20230306231925001](https://s2.loli.net/2023/03/06/gdh43ciamLnBRFV.png)
 
 这样，我们就搭建好了Nacos集群。
 
 ***
 
-![image-20220327153016414](https://tva1.sinaimg.cn/large/e6c9d24ely1h0oh42qki6j21ns0aw0th.jpg)
+![image-20230306231932929](https://s2.loli.net/2023/03/06/xnmustzRkFZJWIP.png)
 
 ## Sentinel 流量防卫兵
 
-**注意：**这一章有点小绕，思路理清。
+**注意：** 这一章有点小绕，思路理清。
 
 经过之前的学习，我们了解了微服务存在的雪崩问题，也就是说一个微服务出现问题，有可能导致整个链路直接不可用，这种时候我们就需要进行及时的熔断和降级，这些策略，我们之前通过使用Hystrix来实现。
 
@@ -651,19 +651,19 @@ Sentinel 具有以下特征:
 
 和Nacos一样，它是独立安装和部署的，下载地址：https://github.com/alibaba/Sentinel/releases
 
-![image-20220327154616456](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ohkq2u65j22qy0nogpw.jpg)
+![image-20230306231950297](https://s2.loli.net/2023/03/06/oZdLMAJaCD3Uw9F.png)
 
 注意下载下来之后是一个`jar`文件（其实就是个SpringBoot项目），我们需要在IDEA中添加一些运行配置：
 
-![image-20220327163002399](https://tva1.sinaimg.cn/large/e6c9d24ely1h0oiu9a58tj22ae0dgdjy.jpg)
+![image-20230306232001525](https://s2.loli.net/2023/03/06/Hjm4Z38s95YiFvI.png)
 
 接着就可以直接启动啦，当然默认端口占用8080，如果需要修改，可以添加环境变量：
 
-![image-20220327163110733](https://tva1.sinaimg.cn/large/e6c9d24ely1h0oivfso85j218e04cmxt.jpg)
+![image-20230306232012301](https://s2.loli.net/2023/03/06/RfVAdtOqJjWlx6E.png)
 
 启动之后，就可以访问到Sentinel的监控页面了，用户名和密码都是`sentinel`，地址：http://localhost:8858/#/dashboard
 
-![image-20220327163206117](https://tva1.sinaimg.cn/large/e6c9d24ely1h0oiweerr4j22mg0dwwfm.jpg)
+![image-20230306232020492](https://s2.loli.net/2023/03/06/QpVRTYtBX6kvj2b.png)
 
 这样就成功开启监控页面了，接着我们需要让我们的服务连接到Sentinel控制台，老规矩，导入依赖：
 
@@ -692,9 +692,9 @@ spring:
 
 现在启动我们的服务，然后访问一次服务，这样Sentinel中就会存在信息了（懒加载机制，不会一上来就加载）：
 
-![image-20220327164111325](https://tva1.sinaimg.cn/large/e6c9d24ely1h0oj5uuyfwj21ny074js0.jpg)
+![image-20230306232031800](https://s2.loli.net/2023/03/06/p4KTaDd1wc5BR92.png)
 
-![image-20220327164336877](https://tva1.sinaimg.cn/large/e6c9d24ely1h0oj8drp9hj223m0u00wi.jpg)
+![image-20230306232038728](https://s2.loli.net/2023/03/06/pzOus21AWqLfr9k.png)
 
 现在我们就可以在Sentinel控制台中对我们的服务运行情况进行实时监控了，可以看到监控的内容非常的多，包括时间点、QPS(每秒查询率)、响应时间等数据。
 
@@ -718,7 +718,7 @@ spring:
 
    顾名思义，就像一个桶开了一个小孔，水流进桶中的速度肯定是远大于水流出桶的速度的，这也是最简单的一种限流思路：
 
-   ![image-20220327172014949](https://tva1.sinaimg.cn/large/e6c9d24ely1h0okai0crij21om08kgmz.jpg)
+   ![image-20230306232054430](https://s2.loli.net/2023/03/06/dMZVz3kDRxYaHg5.png)
 
    我们知道，桶是有容量的，所以当桶的容量已满时，就装不下水了，这时就只有丢弃请求了。
 
@@ -728,7 +728,7 @@ spring:
 
    只能说有点像信号量机制。现在有一个令牌桶，这个桶是专门存放令牌的，每隔一段时间就向桶中丢入一个令牌（速度由我们指定）当新的请求到达时，将从桶中删除令牌，接着请求就可以通过并给到服务，但是如果桶中的令牌数量不足，那么不会删除令牌，而是让此数据包等待。
 
-   ![image-20220327173323339](https://tva1.sinaimg.cn/large/e6c9d24ely1h0okow2vd5j21lg0gkdid.jpg)
+   ![image-20230306232102462](https://s2.loli.net/2023/03/06/F1RxtgBZNQvWpw8.png)
 
    可以试想一下，当流量下降时，令牌桶中的令牌会逐渐积累，这样如果突然出现高并发，那么就能在短时间内拿到大量的令牌。
 
@@ -736,7 +736,7 @@ spring:
 
    我们可以对某一个时间段内的请求进行统计和计数，比如在`14:15`到`14:16`这一分钟内，请求量不能超过`100`，也就是一分钟之内不能超过`100`次请求，那么就可以像下面这样进行划分：
 
-   ![image-20220327174027199](https://tva1.sinaimg.cn/large/e6c9d24ely1h0okvim48fj219404274n.jpg)
+   ![image-20230306232111506](https://s2.loli.net/2023/03/06/XRnKgCivsqFE2ax.png)
 
    虽然这种模式看似比较合理，但是试想一下这种情况：
 
@@ -751,13 +751,13 @@ spring:
 
    相对于固定窗口算法，滑动时间窗口算法更加灵活，它会动态移动窗口，重新进行计算：
 
-   ![image-20220327174906227](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ol4irdckj21fs0jggnr.jpg)
+   ![image-20230306232118585](https://s2.loli.net/2023/03/06/8MyG3WDo1wSBb5Y.png)
 
    虽然这样能够避免固定时间窗口的临界问题，但是这样显然是比固定窗口更加耗时的。
 
 好了，了解完了我们的限流策略和判定方法之后，我们在Sentinel中进行实际测试一下，打开管理页面的簇点链路模块：
 
-![image-20220327175131519](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ol71o173j229j0u0444.jpg)
+![image-20230306232127628](https://s2.loli.net/2023/03/06/4fPg72OJiwhDycL.png)
 
 这里演示对我们的借阅接口进行限流，点击`流控`，会看到让我们添加流控规则：
 
@@ -767,7 +767,7 @@ spring:
 
 这里我们选择`QPS`、阈值设定为`1`，流控模式选择`直接`、流控效果选择`快速失败`，可以看到，当我们快速地进行请求时，会直接返回失败信息：
 
-![image-20220327175821941](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ole5mz4jj21d406it9b.jpg)
+![image-20230306232135482](https://s2.loli.net/2023/03/06/Lrw7ZJNzyDUoYG8.png)
 
 这里各位最好自行尝试一下其他的流控效果，熟悉和加深印象。
 
@@ -779,15 +779,15 @@ spring:
 
 我们首先来看看关联，比如现在我们对自带的`/error`接口进行限流：
 
-![image-20220327182851278](https://tva1.sinaimg.cn/large/e6c9d24egy1h0om9w2tq0j224r0u0gq3.jpg)
+![image-20230306232145053](https://s2.loli.net/2023/03/06/E9vnJRTPZmzaW8V.png)
 
 注意限流是作用于关联资源的，一旦发现关联资源超过阈值，那么就会对当前的资源进行限流，我们现在来测试一下，这里使用PostMan的Runner连续对关联资源发起请求：
 
-![image-20220327183241316](https://tva1.sinaimg.cn/large/e6c9d24egy1h0omdvnxbxj21c00u0goi.jpg)
+![image-20230306232239339](https://s2.loli.net/2023/03/06/QgqsxdvYF59P7ne.png)
 
 开启Postman，然后我们会发现借阅服务已经凉凉：
 
-![image-20220327183331595](https://tva1.sinaimg.cn/large/e6c9d24egy1h0omeqzhpij215o06c3z3.jpg)
+![image-20230306232253804](https://s2.loli.net/2023/03/06/tnKXB2JUarehk5T.png)
 
 当我们关闭掉Postman的任务后，恢复正常。
 
@@ -857,19 +857,19 @@ spring:
 
 然后我们在Sentinel控制台中添加流控规则，注意是针对此方法，可以看到已经自动识别到borrow接口下调用了这个方法：
 
-![image-20220328112645048](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pfp1fhrcj22bh0u00yg.jpg)
+![image-20230306232304858](https://s2.loli.net/2023/03/06/FOzJdtoieAxIvPq.png)
 
 最后我们在浏览器中对这两个接口都进行测试，会发现，无论请求哪个接口，只要调用了Service中的`getUserBorrowDetailByUid`这个方法，都会被限流。注意限流的形式是后台直接抛出异常，至于怎么处理我们后面再说。
 
 那么这个链路选项实际上就是决定只限流从哪个方向来的调用，比如我们只对`borrow2`这个接口对`getUserBorrowDetailByUid`方法的调用进行限流，那么我们就可以为其指定链路：
 
-![image-20220328112949894](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pfs7hqj4j224s0u0dkb.jpg)
+![image-20230306232315010](https://s2.loli.net/2023/03/06/UHbcgSWV2exNCu1.png)
 
 然后我们会发现，限流效果只对我们配置的链路接口有效，而其他链路是不会被限流的。
 
 除了直接对接口进行限流规则控制之外，我们也可以根据当前系统的资源使用情况，决定是否进行限流：
 
-![image-20220328235217680](https://tva1.sinaimg.cn/large/e6c9d24ely1h0q18q6t5vj22dk0u0q72.jpg)
+![image-20230306232323438](https://s2.loli.net/2023/03/06/MHiDyU54L3QsNrc.png)
 
 系统规则支持以下的模式：
 
@@ -912,7 +912,7 @@ spring:
 
 这样，当被限流时，就会被重定向到指定页面：
 
-![image-20220328153755461](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pmyc5o1uj21gi06m3zc.jpg)
+![image-20230306232335949](https://s2.loli.net/2023/03/06/PfVOQWJrTiZGqh7.png)
 
 那么，对于方法级别的限流呢？经过前面的学习我们知道，当某个方法被限流时，会直接在后台抛出异常，那么这种情况我们该怎么处理呢，比如我们之前在Hystrix中可以直接添加一个替代方案，这样当出现异常时会直接执行我们的替代方法并返回，Sentinel也可以。
 
@@ -939,7 +939,7 @@ public UserBorrowDetail blocked(int uid, BlockException e) {
 
 可以看到，一旦被限流将执行替代方案，最后返回的结果就是：
 
-![image-20220328154430549](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pn56vzirj217y06kaai.jpg)
+![image-20230306232346185](https://s2.loli.net/2023/03/06/p1Y53LPihOGZjBV.png)
 
 注意`blockHandler`只能处理限流情况下抛出的异常，包括下面即将要介绍的热点参数限流也是同理，如果是方法本身抛出的其他类型异常，不在管控范围内，但是可以通过其他参数进行处理：
 
@@ -960,7 +960,7 @@ String except(Throwable t){
 
 这样，其他的异常也可以有替代方案了：
 
-![image-20220328161940219](https://tva1.sinaimg.cn/large/e6c9d24ely1h0po5s15rej218u06uwev.jpg)
+![image-20230306232354931](https://s2.loli.net/2023/03/06/pk1HjSi9VyxwOJQ.png)
 
 特别注意这种方式会在没有配置`blockHandler`的情况下，将Sentinel机制内（也就是限流的异常）的异常也一并处理了，如果配置了`blockHandler`，那么在出现限流时，依然只会执行`blockHandler`指定的替代方案（因为限流是在方法执行之前进行的）
 
@@ -988,21 +988,21 @@ String findUserBorrows2(@RequestParam(value = "a", required = false) int a,
 
 启动之后，我们在Sentinel里面进行热点配置：
 
-![image-20220328145654180](https://tva1.sinaimg.cn/large/e6c9d24ely1h0plrnnjlqj22fh0u0aec.jpg)
+![image-20230306232406587](https://s2.loli.net/2023/03/06/fIlhGM3jPxb7wgS.png)
 
 然后开始访问我们的测试接口，可以看到在携带参数a时，当访问频率超过设定值，就会直接被限流，这里是直接在后台抛出异常：
 
-![image-20220328145726479](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pls7lm97j21j20d6q4z.jpg)
+![image-20230306232452209](https://s2.loli.net/2023/03/06/hskQVKnE2y5PftO.png)
 
-![image-20220328145851133](https://tva1.sinaimg.cn/large/e6c9d24ely1h0plto9gujj222e07imyn.jpg)
+![image-20230306232500754](https://s2.loli.net/2023/03/06/nC6W5T4OGcJNypA.png)
 
 而我们使用其他参数或是不带`a`参数，那么就不会出现这种问题了：
 
-![image-20220328145838378](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pltgil5hj214w07mwf3.jpg)
+![image-20230306232514532](https://s2.loli.net/2023/03/06/WVguflyZ43NxE7j.png)
 
 除了直接对某个参数精准限流外，我们还可以对参数携带的指定值单独设定阈值，比如我们现在不仅希望对参数`a`限流，而且还希望当参数`a`的值为10时，QPS达到5再进行限流，那么就可以设定例外：
 
-![image-20220328150138096](https://tva1.sinaimg.cn/large/e6c9d24ely1h0plwl48w0j220a0u0gp0.jpg)
+![image-20230306232525342](https://s2.loli.net/2023/03/06/oipjTJBHsMSdDvc.png)
 
 这样，当请求携带参数`a`，且参数`a`的值为10时，阈值将按照我们指定的特例进行计算。
 
@@ -1010,7 +1010,7 @@ String findUserBorrows2(@RequestParam(value = "a", required = false) int a,
 
 还记得我们前所说的服务降级吗，也就是说我们需要在整个微服务调用链路出现问题的时候，及时对服务进行降级，以防止问题进一步恶化。
 
-![image-20220324141706946](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ky50sw4jj219s07yabg.jpg)
+![image-20230306232538279](https://s2.loli.net/2023/03/06/AxrzjvtPWJ2YCZI.png)
 
 那么，各位是否有思考过，如果在某一时刻，服务B出现故障（可能就卡在那里了），而这时服务A依然有大量的请求，在调用服务B，那么，由于服务A没办法再短时间内完成处理，新来的请求就会导致线程数不断地增加，这样，CPU的资源很快就会被耗尽。
 
@@ -1020,7 +1020,7 @@ String findUserBorrows2(@RequestParam(value = "a", required = false) int a,
 
    线程池隔离实际上就是对每个服务的远程调用单独开放线程池，比如服务A要调用服务B，那么只基于固定数量的线程池，这样即使在短时间内出现大量请求，由于没有线程可以分配，所以就不会导致资源耗尽了。
 
-   ![image-20220328121932455](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ph7xi5qbj21fo09y404.jpg)
+   ![image-20230306232549778](https://s2.loli.net/2023/03/06/CbYxA3d7w46OlMm.png)
 
 2. **信号量隔离**
 
@@ -1030,7 +1030,7 @@ String findUserBorrows2(@RequestParam(value = "a", required = false) int a,
 
 好了，说回我们的熔断和降级，当下游服务因为某种原因变得不可用或响应过慢时，上游服务为了保证自己整体服务的可用性，不再继续调用目标服务而是快速返回或是执行自己的替代方案，这便是服务降级。
 
-![image-20220328124619289](https://tva1.sinaimg.cn/large/e6c9d24ely1h0phzsecsij20ig0i274r.jpg)
+![image-20230306232602853](https://s2.loli.net/2023/03/06/gY62LD3vw157WiU.png)
 
 整个过程分为三个状态：
 
@@ -1040,11 +1040,11 @@ String findUserBorrows2(@RequestParam(value = "a", required = false) int a,
 
 那么我们来看看Sentinel中如何进行熔断和降级操作，打开管理页面，我们可以自由新增熔断规则：
 
-![image-20220328125115760](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pi4xii37j22mo0t4dku.jpg)
+![image-20230306232618547](https://s2.loli.net/2023/03/06/7BW6LGXQNl5b1Iv.png)
 
 其中，熔断策略有三种模式：
 
-1. **慢调用比例：**如果出现那种半天都处理不完的调用，有可能就是服务出现故障，导致卡顿，这个选项是按照最大响应时间（RT）进行判定，如果一次请求的处理时间超过了指定的RT，那么就被判定为`慢调用`，在一个统计时长内，如果请求数目大于最小请求数目，并且被判定为`慢调用`的请求比例已经超过阈值，将触发熔断。经过熔断时长之后，将会进入到半开状态进行试探（这里和Hystrix一致）
+1. **慢调用比例：** 如果出现那种半天都处理不完的调用，有可能就是服务出现故障，导致卡顿，这个选项是按照最大响应时间（RT）进行判定，如果一次请求的处理时间超过了指定的RT，那么就被判定为`慢调用`，在一个统计时长内，如果请求数目大于最小请求数目，并且被判定为`慢调用`的请求比例已经超过阈值，将触发熔断。经过熔断时长之后，将会进入到半开状态进行试探（这里和Hystrix一致）
 
    然后修改一下接口的执行，我们模拟一下慢调用：
 
@@ -1058,13 +1058,13 @@ String findUserBorrows2(@RequestParam(value = "a", required = false) int a,
 
    重启，然后我们创建一个新的熔断规则：
 
-   ![image-20220328131105084](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pipk23g6j227a0o0tbt.jpg)
+   ![image-20230306232632385](https://s2.loli.net/2023/03/06/ExWIKFSNpPoksiT.png)
 
    可以看到，超时直接触发了熔断，进入到阻止页面：
 
-   ![image-20220328131018951](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pior2olsj21nm088wf8.jpg)
+   ![image-20230306232642387](https://s2.loli.net/2023/03/06/CmdPgcqvX4a2u9p.png)
 
-2. **异常比例：**这个与慢调用比例类似，不过这里判断的是出现异常的次数，与上面一样，我们也来进行一些小测试：
+2. **异常比例：** 这个与慢调用比例类似，不过这里判断的是出现异常的次数，与上面一样，我们也来进行一些小测试：
 
    ```java
    @RequestMapping("/borrow2/{uid}")
@@ -1075,21 +1075,21 @@ String findUserBorrows2(@RequestParam(value = "a", required = false) int a,
 
    启动服务器，接着添加我们的熔断规则：
 
-   ![image-20220328132443315](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pj3qutgtj225o0noju9.jpg)
+   ![image-20230306232652092](https://s2.loli.net/2023/03/06/Dz3EgG9eH4UXTkJ.png)
 
    现在我们进行访问，会发现后台疯狂报错，然后就熔断了：
 
-   ![image-20220328132815856](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pj7f4fgbj22180cswjm.jpg)
+   ![image-20230306232702794](https://s2.loli.net/2023/03/06/jSp92ODTRhlxJsn.png)
 
-   ![image-20220328132804164](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pj78bdkgj21a606i3z5.jpg)
+   ![image-20230306232711467](https://s2.loli.net/2023/03/06/FfhalnZdS2ujm1t.png)
 
-3. **异常数：**这个和上面的唯一区别就是，只要达到指定的异常数量，就熔断，这里我们修改一下熔断规则：
+3. **异常数：** 这个和上面的唯一区别就是，只要达到指定的异常数量，就熔断，这里我们修改一下熔断规则：
 
-   ![image-20220328132927745](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pj8oajy0j221u0nk419.jpg)
+   ![image-20230306232720801](https://s2.loli.net/2023/03/06/CugOUozGA6inB3R.png)
 
    现在我们再次不断访问此接口，可以发现，效果跟之前其实是差不多的，只是判断的策略稍微不同罢了：
 
-   ![image-20220328132804164](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pj78bdkgj21a606i3z5.jpg)
+   ![image-20230306232738961](https://s2.loli.net/2023/03/06/XC1VekDfainIpv6.png)
 
 那么熔断规则如何设定我们了解了，那么，如何自定义服务降级呢？之前在使用Hystrix的时候，如果出现异常，可以执行我们的替代方案，Sentinel也是可以的。
 
@@ -1109,11 +1109,11 @@ UserBorrowDetail test(int uid, BlockException e){
 
 接着我们对进行熔断配置，注意是对我们添加的`@SentinelResource`中指定名称的`findUserBorrows2`进行配置：
 
-![image-20220328160248977](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pno8hcvoj22le0nuafl.jpg)
+![image-20230306232759448](https://s2.loli.net/2023/03/06/QkofY5gzwSr6WGn.png)
 
 OK，可以看到熔断之后，服务降级之后的效果：
 
-![image-20220328160112038](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pnmjycafj21ci06o3z9.jpg)
+![image-20230306232809712](https://s2.loli.net/2023/03/06/5kLcAaT6wJgYXGx.png)
 
 最后我们来看一下如何让Feign的也支持Sentinel，前面我们使用Hystrix的时候，就可以直接对Feign的每个接口调用单独进行服务降级，而使用Sentinel，也是可以的，首先我们需要在配置文件中开启支持：
 
@@ -1139,7 +1139,7 @@ public class UserClientFallback implements UserClient{
 
 然后直接启动就可以了，中途的时候我们吧用户服务全部下掉，可以看到正常使用替代方案：
 
-![image-20220328165606119](https://tva1.sinaimg.cn/large/e6c9d24ely1h0pp7oe8yuj228k06iwfy.jpg)
+![image-20230306232821953](https://s2.loli.net/2023/03/06/M2yZpJLfs1i9adC.png)
 
 这样Feign的配置就OK了，那么传统的RestTemplate呢？我们可以使用`@SentinelRestTemplate`注解实现：
 
@@ -1157,28 +1157,28 @@ public class UserClientFallback implements UserClient{
 
 ***
 
-![image-20220329112537891](https://tva1.sinaimg.cn/large/e6c9d24egy1h0qla4zlihj21m0064glz.jpg)
+![image-20230306232833262](https://s2.loli.net/2023/03/06/8OCeNap2Vy6X7WH.png)
 
 ## Seata与分布式事务
 
-重难点内容，坑也多得离谱，最好保持跟UP一样的版本，**官方文档：**https://seata.io/zh-cn/docs/overview/what-is-seata.html
+重难点内容，坑也多得离谱，最好保持跟UP一样的版本，**官方文档：** https://seata.io/zh-cn/docs/overview/what-is-seata.html
 
 在前面的阶段中，我们学习过事务，还记得我们之前谈到的数据库事务的特性吗？
 
-* **原子性：**一个事务（transaction）中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。
-* **一致性：**在事务开始之前和事务结束以后，数据库的完整性没有被破坏。这表示写入的资料必须完全符合所有的预设规则，这包含资料的精确度、串联性以及后续数据库可以自发性地完成预定的工作。
-* **隔离性：**数据库允许多个并发事务同时对其数据进行读写和修改的能力，隔离性可以防止多个事务并发执行时由于交叉执行而导致数据的不一致。事务隔离分为不同级别，包括读未提交（Read uncommitted）、读已提交（read committed）、可重复读（repeatable read）和串行化（Serializable）。
-* **持久性：**事务处理结束后，对数据的修改就是永久的，即便系统故障也不会丢失。
+* **原子性：** 一个事务（transaction）中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。
+* **一致性：** 在事务开始之前和事务结束以后，数据库的完整性没有被破坏。这表示写入的资料必须完全符合所有的预设规则，这包含资料的精确度、串联性以及后续数据库可以自发性地完成预定的工作。
+* **隔离性：** 数据库允许多个并发事务同时对其数据进行读写和修改的能力，隔离性可以防止多个事务并发执行时由于交叉执行而导致数据的不一致。事务隔离分为不同级别，包括读未提交（Read uncommitted）、读已提交（read committed）、可重复读（repeatable read）和串行化（Serializable）。
+* **持久性：** 事务处理结束后，对数据的修改就是永久的，即便系统故障也不会丢失。
 
 那么各位试想一下，在分布式环境下，有可能出现这样一个问题，比如我们下单购物，那么整个流程可能是这样的：先调用库存服务对库存进行减扣 -> 然后订单服务开始下单 -> 最后用户账户服务进行扣款，虽然看似是一个很简单的一个流程，但是如果没有事务的加持，很有可能会由于中途出错，比如整个流程中订单服务出现问题，那么就会导致库存扣了，但是实际上这个订单并没有生成，用户也没有付款。
 
-![image-20220329111304542](https://tva1.sinaimg.cn/large/e6c9d24egy1h0qkx2w3olj21jo0763zr.jpg)
+![image-20230306233055869](https://s2.loli.net/2023/03/06/AiEXC3wBflPxHGT.png)
 
 上面这种情况时间就是一种多服务多数据源的分布式事务模型（比较常见），因此，为了解决这种情况，我们就得实现分布式事务，让这整个流程保证原子性。
 
 SpringCloud Alibaba为我们提供了用于处理分布式事务的组件Seata。
 
-![image-20220329113049408](https://tva1.sinaimg.cn/large/e6c9d24egy1h0qlfjws7cj21da0qkmzw.jpg)
+![image-20230306233108567](https://s2.loli.net/2023/03/06/jDAy7osQ5YIqruP.png)
 
 Seata 是一款开源的分布式事务解决方案，致力于提供高性能和简单易用的分布式事务服务。Seata 将为用户提供了 AT、TCC、SAGA 和 XA 事务模式，为用户打造一站式的分布式解决方案。
 
@@ -1194,11 +1194,11 @@ Seata 是一款开源的分布式事务解决方案，致力于提供高性能�
 
 那么首先我们对数据库进行修改，这里为了简便，就直接在用户表中添加一个字段用于存储用户能够借阅的书籍数量：
 
-![image-20220329135048063](https://tva1.sinaimg.cn/large/e6c9d24egy1h0qph7expaj21io07e0tt.jpg)
+![image-20230306232857302](https://s2.loli.net/2023/03/06/TvJL2PiWFU4XoaZ.png)
 
 然后修改书籍信息，也是直接添加一个字段用于记录剩余数量：
 
-![image-20220329135307659](https://tva1.sinaimg.cn/large/e6c9d24egy1h0qpjm6mlaj21i006k3ze.jpg)
+![image-20230306232904202](https://s2.loli.net/2023/03/06/WjEcGbtkNrZi1CL.png)
 
 接着我们去编写一下对应的服务吧，首先是用户服务：
 
@@ -1441,15 +1441,15 @@ public class BorrowServiceImpl implements BorrowService{
 
 我们来测试一下：
 
-![image-20220329151445740](https://tva1.sinaimg.cn/large/e6c9d24egy1h0qrwk3pc6j21fo070aav.jpg)
+![image-20230306233138135](https://s2.loli.net/2023/03/06/MPkZb1dA2Khjcty.png)
 
 再次尝试借阅，后台会直接报错：
 
-![image-20220329151512871](https://tva1.sinaimg.cn/large/e6c9d24egy1h0qrx0lrghj21oi06umzv.jpg)
+![image-20230306233147990](https://s2.loli.net/2023/03/06/H43Fy9z76LIvJGd.png)
 
 抛出异常，但是我们发现一个问题，借阅信息添加失败了，但是图书的数量依然被-1，也就是说正常情况下，我们是希望中途出现异常之后，之前的操作全部回滚的：
 
-![image-20220329151615894](https://tva1.sinaimg.cn/large/e6c9d24egy1h0qry46lk7j214o05s3z9.jpg)
+![image-20230306233201664](https://s2.loli.net/2023/03/06/l9D8aXBxkvnZejw.png)
 
 而这里由于是在另一个服务中进行的数据库操作，所以传统的`@Transactional`注解无效，这时就得借助Seata提供分布式事务了。
 
@@ -1461,11 +1461,11 @@ public class BorrowServiceImpl implements BorrowService{
 
    这里的PC实际上指的是Prepare和Commit，也就是说它分为两个阶段，一个是准备一个是提交，整个过程的参与者一共有两个角色，一个是事务的执行者，一个是事务的协调者，实际上整个分布式事务的运作都需要依靠协调者来维持：
 
-   ![image-20220331214050440](https://tva1.sinaimg.cn/large/e6c9d24ely1h0teawzsnnj21hc0duabp.jpg)
+   ![image-20230306233211675](https://s2.loli.net/2023/03/06/BWiUzFrjHAao1kJ.png)
 
    在准备和提交阶段，会进行：
 
-   * **准备阶段：**
+   * **准备阶段：** 
 
      一个分布式事务是由协调者来开启的，首先协调者会向所有的事务执行者发送事务内容，等待所有的事务执行者答复。
 
@@ -1473,7 +1473,7 @@ public class BorrowServiceImpl implements BorrowService{
 
      如果事务执行者执行事务成功，那么就告诉协调者成功Yes，否则告诉协调者失败No，不能提交事务。
 
-   * **提交阶段：**
+   * **提交阶段：** 
 
      当所有的执行者都反馈完成之后，进入第二阶段。
 
@@ -1492,13 +1492,13 @@ public class BorrowServiceImpl implements BorrowService{
 
    三个阶段分别进行：
 
-   * **CanCommit阶段：**
+   * **CanCommit阶段：** 
 
      协调者向执行者发送CanCommit请求，询问是否可以执行事务提交操作，然后开始等待执行者的响应。
 
      执行者接收到请求之后，正常情况下，如果其自身认为可以顺利执行事务，则返回Yes响应，并进入预备状态，否则返回No
 
-   * **PreCommit阶段：**
+   * **PreCommit阶段：** 
 
      协调者根据执行者的反应情况来决定是否可以进入第二阶段事务的PreCommit操作。
 
@@ -1506,7 +1506,7 @@ public class BorrowServiceImpl implements BorrowService{
 
      如果所有的执行者至少有一个返回No，则协调者向所有执行者发送abort请求，所有的执行者在收到请求或是超过一段时间没有收到任何请求时，会直接中断事务。
 
-   * **DoCommit阶段：**
+   * **DoCommit阶段：** 
 
      该阶段进行真正的事务提交。
 
@@ -1524,15 +1524,15 @@ public class BorrowServiceImpl implements BorrowService{
 
    补偿事务TCC就是Try、Confirm、Cancel，它对业务有侵入性，一共分为三个阶段，我们依次来解读一下。
 
-   * **Try阶段：**
+   * **Try阶段：** 
 
      比如我们需要在借书时，将书籍的库存`-1`，并且用户的借阅量也`-1`，但是这个操作，除了直接对库存和借阅量进行修改之外，还需要将减去的值，单独存放到冻结表中，但是此时不会创建借阅信息，也就是说只是预先把关键的东西给处理了，预留业务资源出来。
 
-   * **Confirm阶段：**
+   * **Confirm阶段：** 
 
      如果Try执行成功无误，那么就进入到Confirm阶段，接着之前，我们就该创建借阅信息了，只能使用Try阶段预留的业务资源，如果创建成功，那么就对Try阶段冻结的值，进行解冻，整个流程就完成了。当然，如果失败了，那么进入到Cancel阶段。
 
-   * **Cancel阶段：**
+   * **Cancel阶段：** 
 
      不用猜了，那肯定是把冻结的东西还给人家，因为整个借阅操作压根就没成功。就像你付了款买了东西但是网络问题，导致交易失败，钱不可能不还给你吧。
 
@@ -1542,7 +1542,7 @@ public class BorrowServiceImpl implements BorrowService{
 
 前面我们了解了一些分布式事务的解决方案，那么我们来看一下Seata是如何进行分布式事务的处理的。
 
-![image-20220401144916943](https://tva1.sinaimg.cn/large/e6c9d24ely1h0u80yrhjkj21tq0ok77i.jpg)
+![image-20230306233227905](https://s2.loli.net/2023/03/06/LsUq3AvrfhQJPCz.png)
 
 官网给出的是这样的一个架构图，那么图中的RM、TM、TC代表着什么意思呢？
 
@@ -1565,7 +1565,7 @@ Seata支持4种事务模式，官网文档：https://seata.io/zh-cn/docs/overvie
 
 * Saga：用于处理长事务，每个执行者需要实现事务的正向操作和补偿操作：
 
-  ![image-20220401150544921](https://tva1.sinaimg.cn/large/e6c9d24ely1h0u8i381g0j22au0p0gnt.jpg)
+  ![image-20230306233328901](https://s2.loli.net/2023/03/06/vLTZFS4yn26uabA.png)
 
 那么，以AT模式为例，我们的程序如何才能做到不对业务进行侵入的情况下实现分布式事务呢？实际上，Seata客户端，是通过对数据源进行代理实现的，使用的是DataSourceProxy类，所以在程序这边，我们只需要将对应的代理类注册为Bean即可（0.9版本之后支持自动进行代理，不用我们手动操作）
 
@@ -1579,7 +1579,7 @@ Seata也是以服务端形式进行部署的，然后每个服务都是客户端
 
 下载完成之后，放入到IDEA项目目录中，添加启动配置，这里端口使用8868：
 
-![image-20220331150441431](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t2uouvdmj227k0fu429.jpg)
+![image-20230306233336803](https://s2.loli.net/2023/03/06/ykH1BSPcxlvY4on.png)
 
 Seata服务端支持本地部署或是基于注册发现中心部署（比如Nacos、Eureka等），这里我们首先演示一下最简单的本地部署，不需要对Seata的配置文件做任何修改。
 
@@ -1673,23 +1673,23 @@ CREATE TABLE `undo_log`
 
 创建完成之后，我们现在就可以启动三个服务了，我们来测试一下当出现异常的时候是不是会正常回滚：
 
-![image-20220331153615187](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t3rj1lyqj21kq06gwfc.jpg)
+![image-20230306233351571](https://s2.loli.net/2023/03/06/NIe9QFW3jf1DdnV.png)
 
-![image-20220331153823961](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t3tr1a3ej214i05idgj.jpg)
+![image-20230306233359914](https://s2.loli.net/2023/03/06/LwcdO2HuWAhFr5p.png)
 
 首先第一次肯定是正常完成借阅操作的，接着我们再次进行请求，肯定会出现异常：
 
-![image-20220331153655710](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t3s88j4oj21rm0cwmze.jpg)
+![image-20230306233408870](https://s2.loli.net/2023/03/06/6VOfsp9UxYJzgKD.png)
 
-![image-20220331153729453](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t3stb2oaj221g0a6jwj.jpg)
+![image-20230306233417576](https://s2.loli.net/2023/03/06/yEQa2qeiNc5npV9.png)
 
 如果能在栈追踪信息中看到seata相关的包，那么说明分布式事务已经开始工作了，通过日志我们可以看到，出现了回滚操作：
 
-![image-20220331153911759](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t3ul16g8j222403c40z.jpg)
+![image-20230306233428386](https://s2.loli.net/2023/03/06/VtBlx4U1TzcqKra.png)
 
 并且数据库中确实是回滚了扣除操作：
 
-![image-20220331153852374](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t3u8rckaj214i05idgj.jpg)
+![image-20230306233436382](https://s2.loli.net/2023/03/06/WXn9UPgxBVhdHmb.png)
 
 这样，我们就通过Seata简单地实现了分布式事务。
 
@@ -1699,7 +1699,7 @@ CREATE TABLE `undo_log`
 
 我们先单独为Seata配置一个命名空间：
 
-![image-20220331155823306](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t4ejq5rlj22cu0ca3zx.jpg)
+![image-20230306233444767](https://s2.loli.net/2023/03/06/93mXN5dlC2GTLOW.png)
 
 我们打开`conf`目录中的`registry.conf`配置文件：
 
@@ -1753,17 +1753,17 @@ config {
 
 接着，我们需要将配置导入到Nacos中，我们打开一开始下载的源码`script/config-center/nacos`目录，这是官方提供的上传脚本，我们直接运行即可（windows下没对应的bat就很蛋疼，可以使用git命令行来运行一下），这里我们使用这个可交互的版本：
 
-![image-20220331160748379](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t4ocvxg8j218k0fi0uu.jpg)
+![image-20230306233500474](https://s2.loli.net/2023/03/06/1tPwBFn7u3ScCeY.png)
 
 按照提示输入就可以了，不输入就使用的默认值，不知道为啥最新版本有四个因为参数过长还导入失败了，就离谱，不过不影响。
 
 导入成功之后，可以在对应的命名空间下看到对应的配置（为啥非要一个一个配置项单独搞，就不能写一起吗）：
 
-![image-20220331160918380](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t4px1ddhj21ue0u0jwp.jpg)
+![image-20230306233510973](https://s2.loli.net/2023/03/06/8yTQGZluYVe1cg2.png)
 
 注意，还没完，我们还需要将对应的事务组映射配置也添加上，DataId格式为`service.vgroupMapping.事务组名称`，比如我们就使用默认的名称，值全部依然使用default即可：
 
-![image-20220331161119169](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t4s0ehpxj22cc0detbd.jpg)
+![image-20230306233521002](https://s2.loli.net/2023/03/06/UBchb4zPjHAfCSs.png)
 
 现在我们就完成了服务端的Nacos配置，接着我们需要对客户端也进行Nacos配置：
 
@@ -1789,19 +1789,19 @@ seata:
 
 现在我们就可以启动这三个服务了，可以在Nacos中看到Seata以及三个服务都正常注册了：
 
-![image-20220331162215864](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t53eig40j22cq0asac4.jpg)
+![image-20230306233529255](https://s2.loli.net/2023/03/06/PSbw5TFhm74Wu3n.png)
 
-![image-20220331162241748](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t53udw2dj22cm05mt9k.jpg)
+![image-20230306233538630](https://s2.loli.net/2023/03/06/nZUcuM2kJ86zgBv.png)
 
 接着我们就可以访问一下服务试试看了：
 
-![image-20220331162601073](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t57awz7nj21kg06qt9j.jpg)
+![image-20230306233545257](https://s2.loli.net/2023/03/06/Fn3R2Jrq1YyleCh.png)
 
 可以看到效果和上面是一样的，不过现在我们的注册和配置都继承在Nacos中进行了。
 
 我们还可以配置一下事务会话信息的存储方式，默认是file类型，那么就会在运行目录下创建`file_store`目录，我们可以将其搬到数据库中存储，只需要修改一下配置即可：
 
-![image-20220331162840368](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t5a2q6itj22ca0aywgc.jpg)
+![image-20230306233553931](https://s2.loli.net/2023/03/06/Cph9zPF2kaSvKdY.png)
 
 将`store.session.mode`和`store.mode`的值修改为`db`
 
@@ -1813,7 +1813,7 @@ seata:
 
 其他的默认即可：
 
-![image-20220331163100436](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t5chy3tmj226y0u00yl.jpg)
+![image-20230306233612224](https://s2.loli.net/2023/03/06/dlmYNnARZaxJ5MH.png)
 
 接着我们需要将对应的数据库进行创建，创建seata数据库，然后直接CV以下语句：
 
@@ -1889,22 +1889,27 @@ CREATE TABLE IF NOT EXISTS `distributed_lock`
 INSERT INTO `distributed_lock` (lock_key, lock_value, expire) VALUES ('HandleAllSession', ' ', 0);
 ```
 
-![image-20220331163823920](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t5k6ifdbj21ga07yjro.jpg)
+![image-20230306233627086](https://s2.loli.net/2023/03/06/7zvewSLhFmbc8G1.png)
 
 完成之后，重启Seata服务端即可：
 
-![image-20220331164449635](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t5qvps8pj21vi04kgo7.jpg)
+![image-20230306233752098](https://s2.loli.net/2023/03/06/G7qQoEy8DCX9bLJ.png)
 
 看到了数据源初始化成功，现在已经在使用数据库进行会话存储了。
 
 如果Seata服务端出现报错，可能是我们自定义事务组的名称太长了：
 
-![image-20220331165020756](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t5wm6n02j22ee0bkagp.jpg)
+![image-20230306233933641](https://s2.loli.net/2023/03/06/qoNhgzM2PXpZU9B.png)
 
 将`globle_table`表的字段`transaction_server_group`长度适当增加一下即可：
 
-![image-20220331165103414](https://tva1.sinaimg.cn/large/e6c9d24ely1h0t5xcvn5kj214s0f4760.jpg)
+![image-20230306233940850](https://s2.loli.net/2023/03/06/9LnaoUxHzlY1GdV.png)
 
 到此，关于基于nacos模式下的Seata部署，就完成了。
 
 虽然我们这里实现了分布式事务，但是还是给各位同学提出一个问题（可以把自己所认为的结果打在弹幕上），就我们目前这样的程序设计，在高并发下，真的安全吗？比如同一时间100个同学抢同一个书，但是我们知道同一个书就只有3本，如果这时真的同时来了100个请求要借书，会正常地只借出3本书吗？如果不正常，该如何处理？
+
+
+————————————————
+版权声明：本文为柏码知识库版权所有，禁止一切未经授权的转载、发布、出售等行为，违者将被追究法律责任。
+原文链接：https://www.itbaima.cn/document/f6eya9taaelsl35p

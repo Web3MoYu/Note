@@ -1,8 +1,8 @@
-![image-20220317173734208](https://tva1.sinaimg.cn/large/e6c9d24ely1h0d0lfurfij21o40d275h.jpg)
+![image-20230306225143443](https://s2.loli.net/2023/03/06/XeofrwYMN5GQnlC.png)
 
 # 微服务基础
 
-**注意：**此阶段学习推荐的电脑配置，至少配备4核心CPU（主频3.0Ghz以上）+16GB内存，否则卡到你怀疑人生。
+**注意：** 此阶段学习推荐的电脑配置，至少配备4核心CPU（主频3.0Ghz以上）+16GB内存，否则卡到你怀疑人生。
 
 前面我们讲解了SpringBoot框架，通过使用SpringBoot框架，我们的项目开发速度可以说是得到了质的提升。同时，我们对于项目的维护和理解，也会更加的轻松。可见，SpringBoot为我们的开发带来了巨大便捷。而这一部分，我们将基于SpringBoot，继续深入到企业实际场景，探讨微服务架构下的SpringCloud。这个部分我们会更加注重于架构设计上的讲解，弱化实现原理方面的研究。
 
@@ -18,7 +18,7 @@
 
 可以试想一下，如果我们的电脑已经升级到i9-12900K，但是依然在运行项目的时候缓慢，无法同一时间响应成千上万的请求，那么这个问题就已经不是单纯升级机器配置可以解决的了。
 
-![image-20220320174622739](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ghpknvdvj21zg0go78r.jpg)
+![image-20230306225152523](https://s2.loli.net/2023/03/06/dk931jubHw6KifZ.png)
 
 传统单体架构应用随着项目规模的扩大，实际上会暴露越来越多的问题，尤其是一台服务器无法承受庞大的单体应用部署，并且单体应用的维护也会越来越困难，我们得寻找一种新的开发架构来解决这些问题了。
 
@@ -32,7 +32,7 @@ Martin Fowler在2014年提出了“微服务”架构，它是一种全新的架
 * 我们可以同时购买多台主机来分别部署这些微服务，这样，单机的压力就被分散到多台机器，并且每台机器的配置不一定需要太高，这样就能节省大量的成本，同时安全性也得到很大的保证。
 * 甚至同一个微服务可以同时存在多个，这样当其中一个服务器出现问题时，其他服务器也在运行同样的微服务，这样就可以保证一个微服务的高可用。
 
-![image-20220322090754438](https://tva1.sinaimg.cn/large/e6c9d24egy1h0idyqgp12j21m00im0wa.jpg)
+![image-20230306225204783](https://s2.loli.net/2023/03/06/xSAhFqJUfmoa1Pv.png)
 
 当然，这里只是简单的演示一下微服务架构，实际开发中肯定是比这个复杂得多的。
 
@@ -52,7 +52,7 @@ SpringCloud是Spring提供的一套分布式解决方案，集合了一些大型
 
 由于中小型公司没有独立开发自己的分布式基础设施的能力，使用SpringCloud解决方案能够以最低的成本应对当前时代的业务发展。
 
-![image-20220322102706256](https://tva1.sinaimg.cn/large/e6c9d24egy1h0ig93rk52j21ss0nytbj.jpg)
+![image-20230306225221575](https://s2.loli.net/2023/03/06/1ulvL5q4PpbcoGD.png)
 
 可以看到，SpringCloud整体架构的亮点是非常明显的，分布式架构下的各个场景，都有对应的组件来处理，比如基于Netflix（奈飞）的开源分布式解决方案提供的组件：
 
@@ -72,7 +72,7 @@ SpringCloud是Spring提供的一套分布式解决方案，集合了一些大型
 
 官方文档：https://docs.spring.io/spring-cloud-netflix/docs/current/reference/html/
 
-**小贴士：**各位小伙伴在学习的过程中觉得有什么疑惑的可以直接查阅官方文档，我们会在每一个技术开始之前贴上官方文档的地址，方便各位进行查阅，同时在我们的课程中并不一定会完完整整地讲完整个框架的内容，有关详细的功能和使用方法文档中也是写的非常清楚的，感兴趣的可以深入学习哦。
+**小贴士：** 各位小伙伴在学习的过程中觉得有什么疑惑的可以直接查阅官方文档，我们会在每一个技术开始之前贴上官方文档的地址，方便各位进行查阅，同时在我们的课程中并不一定会完完整整地讲完整个框架的内容，有关详细的功能和使用方法文档中也是写的非常清楚的，感兴趣的可以深入学习哦。
 
 ### 微服务项目结构
 
@@ -86,51 +86,49 @@ SpringCloud是Spring提供的一套分布式解决方案，集合了一些大型
 
 我们首先创建一个普通的SpringBoot项目：
 
-![image-20220323105531867](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jmp0yg1lj21zh0u0q8t.jpg)
+![image-20230306225233822](https://s2.loli.net/2023/03/06/8qH2jhtfvacbXMw.png)
 
 然后不需要勾选任何依赖，直接创建即可，项目创建完成并初始化后，我们删除父工程的无用文件，只保留必要文件，像下面这样：
 
-![image-20220323105859454](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jmsk8wcrj21rw0lojt4.jpg)
+![image-20230306225244561](https://s2.loli.net/2023/03/06/DobOruSEf3PKYyI.png)
 
 接着我们就可以按照我们划分的服务，进行子工程创建了，创建一个新的Maven项目，注意父项目要指定为我们一开始创建的的项目，子项目命名随意：
 
-![image-20220323110133466](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jmv8tewij21rc0f640q.jpg)
+![image-20230306225255693](https://s2.loli.net/2023/03/06/mFvb6c34pILHfn7.png)
 
 子项目创建好之后，接着我们在子项目中创建SpringBoot的启动主类：
 
-![image-20220323110756722](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jn1w0ru4j21ra0kedkk.jpg)
+![image-20230306225306775](https://s2.loli.net/2023/03/06/fo4FYOqe3vxSAZc.png)
 
 接着我们点击运行，即可启动子项目了，实际上这个子项目就一个最简单的SpringBoot web项目，注意启动之后最下方有弹窗，我们点击"使用 服务"，这样我们就可以实时查看当前整个大项目中有哪些微服务了：
 
-![image-20220323110917997](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jn3ah2t1j21by078t9h.jpg)
+![image-20230306225317877](https://s2.loli.net/2023/03/06/gf4iAMnUwvjR2WX.png)
 
-![image-20220323111056940](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jn50f7aqj22po0kygus.jpg)
+![image-20230306225325584](https://s2.loli.net/2023/03/06/C1jah7NwT4GgJdX.png)
 
 接着我们以同样的方法，创建其他的子项目，注意我们最好将其他子项目的端口设置得不一样，不然会导致端口占用，我们分别为它们创建`application.yml`文件：
 
-![image-20220323111733605](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jnbw1wi8j22ci0i2778.jpg)
+![image-20230306225335990](https://s2.loli.net/2023/03/06/E9x27lSeOfMhrHt.png)
 
 接着我们来尝试启动一下这三个服务，正常情况下都是可以直接启动的：
 
-![image-20220323111849846](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jnd7uz99j22q40ks7dw.jpg)
+![image-20230306225345323](https://s2.loli.net/2023/03/06/nM4ld9jyKzVT3Y5.png)
 
 可以看到它们分别运行在不同的端口上，这样，就方便不同的程序员编写不同的服务了，提交当前项目代码时的冲突率也会降低。
 
 接着我们来创建一下数据库，这里还是老样子，创建三个表即可，当然实际上每个微服务单独使用一个数据库服务器也是可以的，因为按照单一职责服务只会操作自己对应的表，这里UP主比较穷，就只用一个数据库演示了：
 
-![image-20220323112340995](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jni9lpt1j214w09w3zd.jpg)
+![image-20230306225353141](https://s2.loli.net/2023/03/06/YewLSsGbTj8aykE.png)
 
-![image-20220323112616538](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jnkydk2mj214y090t9h.jpg)
+![image-20230306225402384](https://s2.loli.net/2023/03/06/KcRX57MGWVLlNqT.png)
 
-![image-20220323112842758](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jnnhmt9vj214a072t99.jpg)
+![image-20230306225416144](https://s2.loli.net/2023/03/06/cgdON43mxRDk9Hv.png)
 
-![image-20220323112750936](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jnmlc81qj214806a0th.jpg)
-
-![image-20220323112825430](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jnn6v8jrj214o04y3yw.jpg)
+![image-20230306225422365](https://s2.loli.net/2023/03/06/XjmGn3DbqVKk6Cd.png)
 
 创建好之后，结果如下，一共三张表，各位可以自行添加一些数据到里面，这就不贴出来了：
 
-![image-20220323112922396](https://tva1.sinaimg.cn/large/e6c9d24ely1h0jno6ge9hj21go07mab1.jpg)
+![image-20230306225436945](https://s2.loli.net/2023/03/06/ac76NjHY5byeknP.png)
 
 如果各位嫌麻烦的话可以下载`.sql`文件自行导入。
 
@@ -240,7 +238,7 @@ public class UserController {
 
 现在我们访问即可拿到数据：
 
-![image-20220323133820304](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jredurecj213m06s74p.jpg)
+![image-20230306225457095](https://s2.loli.net/2023/03/06/SC9MUQxdzPmcZij.png)
 
 同样的方式，我们完成一下图书查询业务，注意现在是在图书管理微服务中编写（别忘了导入Mybatis依赖以及配置数据源）：
 
@@ -298,7 +296,7 @@ public class BookController {
 
 同样进行一下测试：
 
-![image-20220323134742618](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jro4g42vj215006sdgg.jpg)
+![image-20230306225506718](https://s2.loli.net/2023/03/06/x9ZOvniJcSp5Cf7.png)
 
 这样，我们一个完整项目的就拆分成了多个微服务，不同微服务之间是独立进行开发和部署的。
 
@@ -308,11 +306,11 @@ public class BookController {
 
 借阅服务是一个关联性比较强的服务，它不仅仅需要查询借阅信息，同时可能还需要获取借阅信息下的详细信息，比如具体那个用户借阅了哪本书，并且用户和书籍的详情也需要同时出现，那么这种情况下，我们就需要去访问除了借阅表以外的用户表和图书表。
 
-![image-20220323140053749](https://tva1.sinaimg.cn/large/e6c9d24egy1h0js1udjp6j21oa0aw40q.jpg)
+![image-20230306225518527](https://s2.loli.net/2023/03/06/T3zKfpqmYkD9VxI.png)
 
 但是这显然是违反我们之前所说的单一职责的，相同的业务功能不应该重复出现，但是现在由需要在此服务中查询用户的信息和图书信息，那怎么办呢？我们可以让一个服务去调用另一个服务来获取信息。
 
-![image-20220323140322502](https://tva1.sinaimg.cn/large/e6c9d24egy1h0js4et40uj21q20agq52.jpg)
+![image-20230306225530398](https://s2.loli.net/2023/03/06/jBtM2k7CFZsu4cU.png)
 
 这样，图书管理微服务和用户管理微服务相对于借阅记录，就形成了一个生产者和消费者的关系，前者是生产者，后者便是消费者。
 
@@ -356,7 +354,7 @@ public class UserBorrowDetail {
 
 因此，我们可以将所有服务需要用到的实体类单独放入另一个一个项目中，然后让这些项目引用集中存放实体类的那个项目，这样就可以保证每个微服务的实体类信息都可以共用了：
 
-![image-20220323141919836](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jsl18z1fj221e0bi0w1.jpg)
+![image-20230306225543154](https://s2.loli.net/2023/03/06/QbfRFayHmqpLVdE.png)
 
 然后只需要在对应的类中引用此项目作为依赖即可：
 
@@ -437,7 +435,7 @@ public class BorrowController {
 
 在数据库中添加一点借阅信息，测试看看能不能正常获取（注意一定要保证三个服务都处于开启状态，否则远程调用会失败）：
 
-![image-20220323143753567](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jt4ccuywj226i06wdh5.jpg)
+![image-20230306225555557](https://s2.loli.net/2023/03/06/OPw5XMghApNrWKe.png)
 
 可以看到，结果正常，没有问题，远程调用成功。
 
@@ -449,7 +447,7 @@ public class BorrowController {
 
 Eureka能够自动注册并发现微服务，然后对服务的状态、信息进行集中管理，这样当我们需要获取其他服务的信息时，我们只需要向Eureka进行查询就可以了。
 
-![image-20220323145051821](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jthur4u0j21lu0dytam.jpg)
+![image-20230306225607857](https://s2.loli.net/2023/03/06/A2mxhZ5jBkPrOdc.png)
 
 像这样的话，服务之间的强关联性就会被进一步削弱。
 
@@ -510,7 +508,7 @@ eureka:
 
 好了，现在差不多可以启动了，启动完成后，直接输入地址+端口即可访问Eureka的管理后台：
 
-![image-20220323152537322](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jui0bzpvj21l60u0wi1.jpg)
+![image-20230306225619725](https://s2.loli.net/2023/03/06/4S9e3gN6ZFTuPbU.png)
 
 可以看到目前还没有任何的服务注册到Eureka，我们接着来配置一下我们的三个微服务，首先还是需要导入Eureka依赖（注意别导错了，名称里面有个starter的才是）：
 
@@ -533,7 +531,7 @@ eureka:
 
 OK，无需在启动类添加注解，直接启动就可以了，然后打开Eureka的服务管理页面，可以看到我们刚刚开启的服务：
 
-![image-20220323154722373](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jv4mtugqj22lm0ec40f.jpg)
+![image-20230306225630173](https://s2.loli.net/2023/03/06/rXnWBA1zo4OlUSt.png)
 
 可以看到`8082`端口上的服务器，已经成功注册到Eureka了，但是这个服务名称怎么会显示为UNKNOWN，我们需要修改一下：
 
@@ -543,13 +541,13 @@ spring:
     name: userservice
 ```
 
-![image-20220323155305545](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jval83b7j22ls0c60ul.jpg)
+![image-20230306225638109](https://s2.loli.net/2023/03/06/1o8pmzBXCtixhKu.png)
 
 当我们的服务启动之后，会每隔一段时间跟Eureka发送一次心跳包，这样Eureka就能够感知到我们的服务是否处于正常运行状态。
 
 现在我们用同样的方法，将另外两个微服务也注册进来：
 
-![image-20220323155948425](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jvhkpma7j22m80c2mzo.jpg)
+![image-20230306225648063](https://s2.loli.net/2023/03/06/gkenG9bT4aMIUio.png)
 
 那么，现在我们怎么实现服务发现呢？
 
@@ -602,19 +600,19 @@ public class BeanConfig {
 
 现在我们就可以正常调用了：
 
-![image-20220323161809122](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jw0nxoykj22720bqjsw.jpg)
+![image-20230306225713484](https://s2.loli.net/2023/03/06/1SHLTwmIK4ChdaD.png)
 
 不对啊，不是说有负载均衡的能力吗，怎么个负载均衡呢？
 
 我们先来看看，同一个服务器实际上是可以注册很多个的，但是它们的端口不同，比如我们这里创建多个用户查询服务，我们现在将原有的端口配置修改一下，由IDEA中设定启动参数来决定，这样就可以多创建几个不同端口的启动项了：
 
-![image-20220323162858616](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jwbxq00pj21ue0rcgqf.jpg)
+![image-20230306225723916](https://s2.loli.net/2023/03/06/ZzmGK4CuSwLVhva.png)
 
-![image-20220323162926482](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jwch1eb2j21ng08ead5.jpg)
+![image-20230306225741406](https://s2.loli.net/2023/03/06/9lPAbiYntQDGNzy.png)
 
 可以看到，在Eureka中，同一个服务出现了两个实例：
 
-![image-20220323163010052](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jwd5r9bgj21w00c8mz4.jpg)
+![image-20230306225750928](https://s2.loli.net/2023/03/06/eXGS3wdvL4RAys6.png)
 
 现在我们稍微修改一下用户查询，然后进行远程调用，看看请求是不是均匀地分配到这两个服务端：
 
@@ -633,13 +631,13 @@ public class UserController {
 }
 ```
 
-![image-20220323163335257](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jwgqas0qj22ci0batb0.jpg)
+![image-20230306225801442](https://s2.loli.net/2023/03/06/BlRf7T5iVMksb1J.png)
 
 可以看到，两个实例都能够均匀地被分配请求：
 
-![image-20220323163448765](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jwi0a3yhj21tk0gqq9l.jpg)
+![image-20230306225808889](https://s2.loli.net/2023/03/06/hysYFAeoLrnRWdX.png)
 
-![image-20220323163457877](https://tva1.sinaimg.cn/large/e6c9d24egy1h0jwi5kezyj21me0hmq83.jpg)
+![image-20230306225818918](https://s2.loli.net/2023/03/06/nDpXICZHc4L5EQm.png)
 
 这样，服务自动发现以及简单的负载均衡就实现完成了，并且，如果某个微服务挂掉了，只要存在其他同样的微服务实例在运行，那么就不会导致整个微服务不可用，极大地保证了安全性。
 
@@ -649,7 +647,7 @@ public class UserController {
 
 为了避免，这种问题，我们也可以像上面那样，搭建Eureka集群，存在多个Eureka服务器，这样就算挂掉其中一个，其他的也还在正常运行，就不会使得服务注册与发现不可用。当然，要是物理黑客直接炸了整个机房，那还是算了吧。
 
-![image-20220323205531185](https://tva1.sinaimg.cn/large/e6c9d24ely1h0k41ady28j21jy0iwmzt.jpg)
+![image-20230306225832945](https://s2.loli.net/2023/03/06/21izKlaCO9oNuYq.png)
 
 我们来看看如何搭建Eureka集群，这里由于机器配置不高，就搭建两个Eureka服务器组成集群。
 
@@ -691,17 +689,17 @@ eureka:
 
 这里由于我们修改成自定义的地址，需要在hosts文件中将其解析到172.0.0.1才能回到localhost，Mac下文件路径为`/etc/hosts`，Windows下为`C:\Windows\system32\drivers\etc\hosts`：
 
-![image-20220323210218653](https://tva1.sinaimg.cn/large/e6c9d24ely1h0k48bkgyoj212q07a0te.jpg)
+![image-20230306225844111](https://s2.loli.net/2023/03/06/aGdiPjeRIOfHo7p.png)
 
 对创建的两个配置文件分别添加启动配置，直接使用`spring.profiles.active`指定启用的配置文件即可：
 
-![image-20220323212308857](https://tva1.sinaimg.cn/large/e6c9d24ely1h0k4u09lpxj22aw0py0y5.jpg)
+!![image-20230306225853705](https://s2.loli.net/2023/03/06/WYhxpSvsFU8tVcR.png)](/Users/nagocoler/Library/Application Support/typora-user-images/image-20230306225853705.png)
 
 接着启动这两个注册中心，这两个Eureka管理页面都可以被访问，我们访问其中一个：
 
-![image-20220323210937341](https://tva1.sinaimg.cn/large/e6c9d24ely1h0k4fxnlxtj21yk0cytao.jpg)
+![image-20230306225903831](https://s2.loli.net/2023/03/06/fbGgz2dRq43DM8O.png)
 
-![image-20220323210619533](https://tva1.sinaimg.cn/large/e6c9d24ely1h0k4chvjv8j21rq07it9k.jpg)
+![image-20230306225916507](https://s2.loli.net/2023/03/06/nmD6H1BZbr7LYWC.png)
 
 可以看到下方`replicas`中已经包含了另一个Eureka服务器的地址，并且是可用状态。
 
@@ -717,11 +715,11 @@ eureka:
 
 可以看到，服务全部成功注册，并且两个Eureka服务端都显示为已注册：
 
-![image-20220323211032311](https://tva1.sinaimg.cn/large/e6c9d24ely1h0k4gvpxdtj21vc0dm41j.jpg)
+![image-20230306225928923](https://s2.loli.net/2023/03/06/GDd5BVMTY1t4oQj.png)
 
 接着我们模拟一下，将其中一个Eureka服务器关闭掉，可以看到它会直接变成不可用状态：
 
-![image-20220323211354516](https://tva1.sinaimg.cn/large/e6c9d24ely1h0k4ke207fj21rm06w75k.jpg)
+![image-20230306225938085](https://s2.loli.net/2023/03/06/8fdxB1PlqVYDRLr.png)
 
 当然，如果这个时候我们重启刚刚关闭的Eureka服务器，会自动同步其他Eureka服务器的数据。
 
@@ -759,9 +757,9 @@ public ClientHttpResponse intercept(final HttpRequest request, final byte[] body
 
 我们可以打个断点看看实际是怎么在执行的，可以看到：
 
-![image-20220323220519463](https://tva1.sinaimg.cn/large/e6c9d24ely1h0k61wb6pxj222y0cm77n.jpg)
+![image-20230306225949475](https://s2.loli.net/2023/03/06/Qri3UYvIJ7M5KAn.png)
 
-![image-20220323220548051](https://tva1.sinaimg.cn/large/e6c9d24ely1h0k62dm3knj21yi0fgwiz.jpg)
+![image-20230306230000711](https://s2.loli.net/2023/03/06/9tBwL1aVHT4MzmI.png)
 
 服务端会在发起请求时执行这些拦截器。
 
@@ -795,7 +793,7 @@ public <T> T execute(String serviceId, LoadBalancerRequest<T> request) throws IO
 
 所以，实际上在进行负载均衡的时候，会向Eureka发起请求，选择一个可用的对应服务，然后会返回此服务的主机地址等信息：
 
-![image-20220324120741736](https://tva1.sinaimg.cn/large/e6c9d24ely1h0kuedkhinj221e0jin2y.jpg)
+![image-20230306230014040](https://s2.loli.net/2023/03/06/zQnj7bcygYJNP1s.png)
 
 ### 自定义负载均衡策略
 
@@ -834,9 +832,9 @@ public class BeanConfig {
 
 接着我们在`BlockingLoadBalancerClient`中添加断点，观察是否采用我们指定的策略进行请求：
 
-![image-20220324221750289](https://tva1.sinaimg.cn/large/e6c9d24ely1h0lc17or9aj221y07swhq.jpg)
+![image-20230306230030016](https://s2.loli.net/2023/03/06/k7p5xmoALuwU82s.png)
 
-![image-20220324221713964](https://tva1.sinaimg.cn/large/e6c9d24ely1h0lc0mbsmqj21ye07yjuh.jpg)
+![image-20230306230040677](https://s2.loli.net/2023/03/06/KJMa6Ehp8k5SfIy.png)
 
 发现访问userservice服务的策略已经更改为我们指定的策略了。
 
@@ -914,13 +912,13 @@ public UserBorrowDetail getUserBorrowDetailByUid(int uid) {
 
 访问，可以看到结果依然是正确的：
 
-![image-20220324181614387](https://tva1.sinaimg.cn/large/e6c9d24ely1h0l51tto72j229e080dhe.jpg)
+![image-20230306230054245](https://s2.loli.net/2023/03/06/koMOYnxtq8UPiac.png)
 
 并且我们可以观察一下两个用户微服务的调用情况，也是以负载均衡的形式进行的。
 
 按照同样的方法，我们接着将图书管理服务的调用也改成接口形式：
 
-![image-20220324181740566](https://tva1.sinaimg.cn/large/e6c9d24ely1h0l53boxmlj21j60bgq51.jpg)
+![image-20230306230101467](https://s2.loli.net/2023/03/06/GiBa7FzQsvkIpdS.png)
 
 最后我们的Service代码就变成了：
 
@@ -953,7 +951,7 @@ public class BorrowServiceImpl implements BorrowService {
 
 继续访问进行测试：
 
-![image-20220324181910173](https://tva1.sinaimg.cn/large/e6c9d24ely1h0l54vuecvj226206igmz.jpg)
+![image-20230306230112322](https://s2.loli.net/2023/03/06/V5fhk2xLo8bXmWA.png)
 
 OK，正常。
 
@@ -967,11 +965,11 @@ OK，正常。
 
 我们知道，微服务之间是可以进行相互调用的，那么如果出现了下面的情况会导致什么问题？
 
-![image-20220324141230070](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ky07zn6tj219g07adgz.jpg)
+![image-20230306230121344](https://s2.loli.net/2023/03/06/dUvO3K8oWMZSVHr.png)
 
 由于位于最底端的服务提供者E发生故障，那么此时会直接导致服务ABCD全线崩溃，就像雪崩了一样。
 
-![image-20220324141706946](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ky50sw4jj219s07yabg.jpg)
+![image-20230306230128050](https://s2.loli.net/2023/03/06/dDMylZ5ejKoxAVF.png)
 
 这种问题实际上是不可避免的，由于多种因素，比如网络卡顿、系统故障、硬件问题等，都存在一定可能，会导致这种极端的情况发生。因此，我们需要寻找一个应对这种极端情况的解决方案。
 
@@ -1032,9 +1030,9 @@ public class BorrowController {
 
 可以看到，虽然我们的服务无法正常运行了，但是依然可以给浏览器正常返回响应数据：
 
-![image-20220324150253610](https://tva1.sinaimg.cn/large/e6c9d24ely1h0kzgnuv0ej21x406ujvb.jpg)
+![image-20230306230144106](https://s2.loli.net/2023/03/06/dRqf87xMFgsO4hL.png)
 
-![image-20220324150310955](https://tva1.sinaimg.cn/large/e6c9d24ely1h0kzgygdd3j218s06qjru.jpg)
+![image-20230306230151243](https://s2.loli.net/2023/03/06/x6Qy3SbkVLYRD4P.png)
 
 服务降级是一种比较温柔的解决方案，虽然服务本身的不可用，但是能够保证正常响应数据。
 
@@ -1069,13 +1067,13 @@ public class BorrowController {
 
 接着，我们在浏览器中疯狂点击刷新按钮，对此服务疯狂发起请求，可以看到后台：
 
-![image-20220324152044551](https://tva1.sinaimg.cn/large/e6c9d24ely1h0kzz87azgj21960hwwhz.jpg)
+![image-20230306230205508](https://s2.loli.net/2023/03/06/TLtsu51w6jlNnzJ.png)
 
 一开始的时候，会正常地去调用Controller对应的方法`findUserBorrows`，发现失败然后进入备选方法，但是我们发现在持续请求一段时间之后，没有再调用这个方法，而是直接调用备选方案，这便是升级到了熔断状态。
 
 我们可以继续不断点击，继续不断地发起请求：
 
-![image-20220324152750797](https://tva1.sinaimg.cn/large/e6c9d24ely1h0l06mgm5yj21uy0b0gns.jpg)
+![image-20230306230223193](https://s2.loli.net/2023/03/06/ZtQ4nz8hPvHBIRC.png)
 
 可以看到，过了一段时间之后，会尝试正常执行一次`findUserBorrows`，但是依然是失败状态，所以继续保持熔断状态。
 
@@ -1083,13 +1081,13 @@ public class BorrowController {
 
 我们可以测试一下，开启另外两个服务之后，继续点击：
 
-![image-20220324153044583](https://tva1.sinaimg.cn/large/e6c9d24ely1h0l09mmg95j21ue0eatb5.jpg)
+![image-20230306230235955](https://s2.loli.net/2023/03/06/E6z2t5ZqxlKAjSB.png)
 
 可以看到，当另外两个服务正常运行之后，当再次尝试调用`findUserBorrows`之后会成功，于是熔断机制就关闭了，服务恢复运行。
 
 总结一下：
 
-![image-20220324153935858](https://tva1.sinaimg.cn/large/e6c9d24ely1h0l0iulmatj21rc0ba0vj.jpg)
+![image-20230306230247024](https://s2.loli.net/2023/03/06/3oiHLFWO9jVpswK.png)
 
 ### OpenFeign实现降级
 
@@ -1149,9 +1147,9 @@ feign:
 
 启动服务，调用接口试试看：
 
-![image-20220325122629016](https://tva1.sinaimg.cn/large/e6c9d24ely1h0m0k7jve9j21zq03kdi6.jpg)
+![image-20230306230301021](https://s2.loli.net/2023/03/06/bieclsNmpqOrdHB.png)
 
-![image-20220325122301779](https://tva1.sinaimg.cn/large/e6c9d24ely1h0m0gmj8ayj229c07q75v.jpg)
+![image-20230306230310524](https://s2.loli.net/2023/03/06/3dn7AlkYGJCmUxw.png)
 
 可以看到，现在已经采用我们的替代方案作为结果。
 
@@ -1203,7 +1201,7 @@ public class HystrixDashBoardApplication {
 
 添加此依赖后，我们可以在IDEA中查看运行情况：
 
-![image-20220324225633805](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ld5ia0z8j21uw0e6god.jpg)
+![image-20230306230322560](https://s2.loli.net/2023/03/06/a8XmyswEbW1TrtA.png)
 
 然后在配置文件中配置Actuator添加暴露：
 
@@ -1217,27 +1215,27 @@ management:
 
 接着我们打开刚刚启动的管理页面，地址为：http://localhost:8900/hystrix/
 
-![image-20220324225733550](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ld6jtiijj22ij0u042v.jpg)
+![image-20230306230335020](https://s2.loli.net/2023/03/06/5rbCxLtR1e8DZAu.png)
 
 在中间填写要监控的服务：比如借阅服务：http://localhost:8301/actuator/hystrix.stream，注意后面要添加`/actuator/hystrix.stream`，然后点击Monitor Stream即可进入监控页面：
 
-![image-20220324230515009](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ldejq3n0j22ly0puwhu.jpg)
+![image-20230306230345666](https://s2.loli.net/2023/03/06/iRT6cva5jfd7JSK.png)
 
 可以看到现在都是Loading状态，这是因为还没有开始统计，我们现在尝试调用几次我们的服务：
 
-![image-20220324230559068](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ldfbaoi5j22660bqgnc.jpg)
+![image-20230306230355084](https://s2.loli.net/2023/03/06/evLyDl8gVxboiap.png)
 
 可以看到，在调用之后，监控页面出现了信息：
 
-![image-20220324230703600](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ldgfihczj21wq0ksn03.jpg)
+![image-20230306230402987](https://s2.loli.net/2023/03/06/UtcOjEfdnMGQ7ge.png)
 
 可以看到5次访问都是正常的，所以显示为绿色，接着我们来尝试将图书服务关闭，这样就会导致服务降级甚至熔断，然后再多次访问此服务看看监控会如何变化：
 
-![image-20220324230923472](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ldiuq9naj222a0l2whx.jpg)
+![image-20230306230414273](https://s2.loli.net/2023/03/06/97by1FDirquwtv2.png)
 
 可以看到，错误率直接飙升到100%，并且一段时间内持续出现错误，中心的圆圈也变成了红色，我们继续进行访问：
 
-![image-20220324231022133](https://tva1.sinaimg.cn/large/e6c9d24ely1h0ldjvo0ppj21j20iy0v3.jpg)
+![image-20230306230501543](https://s2.loli.net/2023/03/06/mrVf1qSsDXioIBc.png)
 
 在出现大量错误的情况下保持持续访问，可以看到此时已经将服务熔断，`Circuit`更改为Open状态，并且图中的圆圈也变得更大，表示压力在持续上升。
 
@@ -1251,13 +1249,13 @@ management:
 
 我们知道，如果我们需要连接互联网，那么就需要将手机或是电脑连接到家里的路由器才可以，而路由器则连接光猫，光猫再通过光纤连接到互联网，也就是说，互联网方向发送过来的数据，需要经过路由器才能到达我们的设备。而路由器充当的就是数据包中转站，所有的局域网设备都无法直接与互联网连接，而是需要经过路由器进行中转，我们一般说路由器下的网络是内网，而互联网那一端是外网。
 
-![image-20220324164439809](https://tva1.sinaimg.cn/large/e6c9d24ely1h0l2ejn70ej21di0b4wfr.jpg)
+![image-20230306230515898](https://s2.loli.net/2023/03/06/YF5VbcRAz8ZG6nJ.png)
 
 我们的局域网设备，无法被互联网上的其他设备直接访问，肯定是能够保证到安全性的。并互联网发送过来的数据，需要经过路由器进行解析，识别到底是哪一个设备的数据包，然后再发送给对应的设备。
 
 而我们的微服务也是这样，一般情况下，可能并不是所有的微服务都需要直接暴露给外部调用，这时我们就可以使用路由机制，添加一层防护，让所有的请求全部通过路由来转发到各个微服务，并且转发给多个相同微服务实例也可以实现负载均衡。
 
-![image-20220325130147758](https://tva1.sinaimg.cn/large/e6c9d24ely1h0m1kz3kycj21iq0huwhb.jpg)
+![image-20230306230524100](https://s2.loli.net/2023/03/06/gMwst5OGfvPCTd8.png)
 
 在之前，路由的实现一般使用Zuul，但是已经停更，而现在新出现了由SpringCloud官方开发的Gateway路由，它相比Zuul不仅性能上得到了一定的提升，并且是官方推出，契合性也会更好，所以我们这里就主要讲解Gateway。
 
@@ -1296,7 +1294,7 @@ spring:
 
 现在就可以启动了：
 
-![image-20220324170951878](https://tva1.sinaimg.cn/large/e6c9d24ely1h0l34rlri8j22dw0b80ve.jpg)
+![image-20230306230532720](https://s2.loli.net/2023/03/06/4puUrkIMBlx3emn.png)
 
 但是现在还没有配置任何的路由功能，我们接着将路由功能进行配置：
 
@@ -1316,17 +1314,17 @@ spring:
 
 接着启动网关，搭载Arm架构芯片的Mac电脑可能会遇到这个问题：
 
-![image-20220325150924472](https://tva1.sinaimg.cn/large/e6c9d24ely1h0m59qpakvj21og074q5a.jpg)
+![image-20230306230542772](https://s2.loli.net/2023/03/06/IuoAzPmXnYHSDv3.png)
 
 这是因为没有找到适用于此架构的动态链接库，不影响使用，无视即可，希望以后的版本能修复吧。
 
 可以看到，我们现在可以直接通过路由来访问我们的服务了：
 
-![image-20220324171724493](https://tva1.sinaimg.cn/large/e6c9d24ely1h0l3cme88qj226g0a6abq.jpg)
+![image-20230306230551480](https://s2.loli.net/2023/03/06/vOl9w4apbQSVAWH.png)
 
 注意此时依然可以通过原有的服务地址进行访问：
 
-![image-20220324171909828](https://tva1.sinaimg.cn/large/e6c9d24ely1h0l3efx1npj225c070400.jpg)
+![image-20230306230600243](https://s2.loli.net/2023/03/06/y8KA1UR6tFMj5ch.png)
 
 这样我们就可以将不需要外网直接访问的微服务全部放到内网环境下，而只依靠网关来对外进行交涉。
 
@@ -1378,9 +1376,9 @@ public class BookController {
 
 现在我们通过Gateway访问我们的图书管理服务：
 
-![image-20220325150730814](https://tva1.sinaimg.cn/large/e6c9d24ely1h0m57rm7t4j21bq07kt9c.jpg)
+![image-20230306230612435](https://s2.loli.net/2023/03/06/oUf2VFXmrQHiz6C.png)
 
-![image-20220325151220776](https://tva1.sinaimg.cn/large/e6c9d24ely1h0m5cstkq3j21v403q0ud.jpg)
+![image-20230306230621114](https://s2.loli.net/2023/03/06/x3YjDRZfqBQ1TSC.png)
 
 可以看到这里成功获取到由网关添加的请求头信息了。
 
@@ -1419,9 +1417,9 @@ public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
 可以看到结果：
 
-![image-20220325154443063](https://tva1.sinaimg.cn/large/e6c9d24ely1h0m6ahb0zvj21ak07qaah.jpg)
+![image-20230306230634856](https://s2.loli.net/2023/03/06/P8ZFIuNardMKvQB.png)
 
-![image-20220325154508853](https://tva1.sinaimg.cn/large/e6c9d24ely1h0m6axjl3oj21ai072t9h.jpg)
+![image-20230306230645619](https://s2.loli.net/2023/03/06/bkd3BCsDxvYNPoX.png)
 
 成功实现规则判断和拦截操作。
 
@@ -1443,7 +1441,7 @@ public class TestFilter implements GlobalFilter, Ordered {   //实现Ordered接�
 
 ## Config 配置中心
 
-**官方文档：**https://docs.spring.io/spring-cloud-config/docs/current/reference/html/
+**官方文档：** https://docs.spring.io/spring-cloud-config/docs/current/reference/html/
 
 经过前面的学习，我们对于一个分布式应用的技术选型和搭建已经了解得比较多了，但是各位有没有发现一个问题，如果我们的微服务项目需要部署很多个实例，那么配置文件我们岂不是得一个一个去改，可能十几个实例还好，要是有几十个上百个呢？那我们一个一个去配置，岂不直接猝死在工位上。
 
@@ -1451,7 +1449,7 @@ public class TestFilter implements GlobalFilter, Ordered {   //实现Ordered接�
 
 > Spring Cloud Config 为分布式系统中的外部配置提供服务器端和客户端支持。使用 Config Server，您可以集中管理所有环境中应用程序的外部配置。
 
-![image-20220325171754862](https://tva1.sinaimg.cn/large/e6c9d24ely1h0m8zggbzyj21ha0csjt5.jpg)
+![image-20230306230655437](https://s2.loli.net/2023/03/06/Pe3bs6OVMgjR7iu.png)
 
 实际上Spring Cloud Config就是一个配置中心，所有的服务都可以从配置中心取出配置，而配置中心又可以从GitHub远程仓库中获取云端的配置文件，这样我们只需要修改GitHub中的配置即可对所有的服务进行配置管理了。
 
@@ -1500,15 +1498,15 @@ eureka:
 
 先启动一次看看，能不能成功：
 
-![image-20220325173932623](https://tva1.sinaimg.cn/large/e6c9d24ely1h0m9lyfoz2j226409uabs.jpg)
+![image-20230306230706452](https://s2.loli.net/2023/03/06/9TdormfJkgK258q.png)
 
 这里我们以本地仓库为例（就不用GitHub了，卡到怀疑人生了），首先在项目目录下创建一个本地Git仓库，打开终端，在桌面上创建一个新的本地仓库：
 
-![image-20220325220843990](https://tva1.sinaimg.cn/large/e6c9d24ely1h0mhe24rhjj211q05cabb.jpg)
+![image-20230306230726846](https://s2.loli.net/2023/03/06/EIFUo5rVvd4Nc3C.png)
 
 然后我们在文件夹中随便创建一些配置文件，注意名称最好是{服务名称}-{环境}.yml：
 
-![image-20220325221411834](https://tva1.sinaimg.cn/large/e6c9d24ely1h0mhjqi2o6j216205gaan.jpg)
+![image-20230306230735629](https://s2.loli.net/2023/03/06/3AO4XzashuPwlRI.png)
 
 然后我们在配置文件中，添加本地仓库的一些信息（远程仓库同理），详细使用教程：https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_git_backend
 
@@ -1531,11 +1529,11 @@ spring:
 
 比如我们要访问图书服务的生产环境代码，可以使用 http://localhost:8700/bookservice/prod/main 链接，它会显示详细信息：
 
-![image-20220325221946363](https://tva1.sinaimg.cn/large/e6c9d24ely1h0mhpjeaiyj22is0cadjs.jpg)
+![image-20230306230748280](https://s2.loli.net/2023/03/06/aT23EdegJwqvpLC.png)
 
 也可以使用 http://localhost:8700/main/bookservice-prod.yml 链接，它仅显示配置文件原文：
 
-![image-20220325222309095](https://tva1.sinaimg.cn/large/e6c9d24ely1h0mht1siqdj21ro0hu41a.jpg)
+![image-20230306230755591](https://s2.loli.net/2023/03/06/kUAMsjZaTbHiG9X.png)
 
 当然，除了使用Git来保存之外，还支持一些其他的方式，详细情况请查阅官网。
 
@@ -1571,7 +1569,7 @@ spring:
 
 配置完成之后，启动图书服务：
 
-![image-20220325224708591](https://tva1.sinaimg.cn/large/e6c9d24ely1h0mii0tbegj22l208k43a.jpg)
+![image-20230306230806269](https://s2.loli.net/2023/03/06/7VaosxbqtRm5X4i.png)
 
 可以看到已经从远端获取到了配置，并进行启动。
 
@@ -1581,7 +1579,7 @@ spring:
 
 经过前面的学习，我们对SpringCloud Netflix以及SpringCloud官方整个生态下的组件认识也差不多了，入门教学就到此为止，下一章将开启真正精彩的正片部分，本章的最后我们还是来了解一些理论上的知识。
 
-![image-20220325230915356](https://tva1.sinaimg.cn/large/e6c9d24ely1h0mj50oc1zj212e0jw756.jpg)
+![image-20230306230815241](https://s2.loli.net/2023/03/06/9k6oeMZIE28T3t7.png)
 
 > CAP原则又称CAP定理，指的是在一个分布式系统中，存在Consistency（一致性）、Availability（可用性）、Partition tolerance（分区容错性），三者不可同时保证，最多只能保证其中的两者。   
 >
@@ -1610,3 +1608,7 @@ spring:
 比如我们实现的Eureka集群，它使用的就是AP方案，Eureka各个节点都是平等的，少数节点挂掉不会影响正常节点的工作，剩余的节点依然可以提供注册和查询服务。而Eureka客户端在向某个Eureka服务端注册时如果发现连接失败，则会自动切换至其他节点。只要有一台Eureka服务器正常运行，那么就能保证服务可用**（A）**，只不过查询到的信息可能不是最新的**（C）**
 
 在之后的章节，我们还会继续了解这些理论的其他实际应用。
+
+————————————————
+版权声明：本文为柏码知识库版权所有，禁止一切未经授权的转载、发布、出售等行为，违者将被追究法律责任。
+原文链接：https://www.itbaima.cn/document/oejzo0l77zeb6a7e
