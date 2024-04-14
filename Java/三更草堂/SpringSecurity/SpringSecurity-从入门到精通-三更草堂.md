@@ -1264,7 +1264,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             Authentication authenticate = authenticationManager.authenticate(authenticationToken);
             //如果认证通过了，使用userid生成一个jwt jwt存入ResponseResult返回
             LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
-            String userId = loginUser.getUser().getId().toString();
+            String userId = loginUser.getUser().getId().toString();	
             String token = JWTUtils.creatTokenV1(userId, JWT_EXPIRE_TIME);
             //把完整的用户信息存入redis userid作为key
             Map<String, Object> map = new HashMap<>();
