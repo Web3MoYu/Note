@@ -1,0 +1,138 @@
+{
+  "main": {
+    "id": "334e4abd74385aba",
+    "type": "split",
+    "children": [
+      {
+        "id": "c4364f0292dd4393",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6bdb40f0c1fa7e3d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Web3/Solidity/Solidity-02.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "5ef5f01712c924bc",
+    "type": "split",
+    "children": [
+      {
+        "id": "439aad74461d79a2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5c1a5863bc041659",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "66969d72cce8d508",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "4974c4d3555598c6",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          },
+          {
+            "id": "b5459d9c3f971820",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Web3/Solidity/Solidity-02.md"
+              }
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "54577a21eafa240d",
+    "type": "split",
+    "children": [
+      {
+        "id": "a204aa6b3c1c9d5a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "64055f145ab99c64",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "alphabetical",
+                "useHierarchy": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
+    }
+  },
+  "active": "b5459d9c3f971820",
+  "lastOpenFiles": [
+    "未命名.md",
+    "Web3/Solidity/Solidity-02.md",
+    "Web3/Solidity/Solidity-01.md",
+    "未命名",
+    "软件开发/前端/axios.md",
+    "Web3/Solidity",
+    "Web3",
+    "软件开发/Linux/Docker/img/1.png",
+    "软件开发",
+    "软件开发/Linux/Docker/Docker安装软件.md",
+    "软件开发/Linux/小坑.md",
+    "未命名.canvas",
+    "软件开发/Jsp.md",
+    "软件开发/Git.md",
+    "软件开发/杂项.md"
+  ]
+}
