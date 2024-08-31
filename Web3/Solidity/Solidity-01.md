@@ -3,7 +3,7 @@
 
 Solidity 的代码都包裹在**合约**里面. 一份`合约`就是以太应币应用的基本模块， 所有的变量和函数都属于一份合约, 它是你所有应用的起点.
 一份名为 `HelloWorld` 的空合约如下:
-```Js
+```solidity
 contract HelloWorld {
 
 }
@@ -14,7 +14,7 @@ contract HelloWorld {
 例如: `pragma solidity ^0.4.19;` (当前 Solidity 的最新版本是 0.4.19).
 综上所述， 下面就是一个最基本的合约 — 每次建立一个新的项目时的第一段代码:
 
-```Js
+```solidity
 pragma solidity ^0.4.19;
 
 contract HelloWorld {
@@ -26,7 +26,7 @@ contract HelloWorld {
 为了建立我们的僵尸部队， 让我们先建立一个基础合约，称为 `ZombieFactory`。
 1. 在右边的输入框里输入 `0.4.19`，我们的合约基于这个版本的编译器。
 2. 建立一个空合约 `ZombieFactory`。
-``` Js
+``` solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory { 
@@ -39,7 +39,7 @@ contract ZombieFactory {
 
 **状态变量**是被永久地保存在合约中。也就是说它们被写入以太币区块链中. 想象成写入一个数据库。
 例子:
-```Js
+```solidity
 contract Example {
   // 这个无符号整数将会永久的被保存在区块链中
   uint myUnsignedInteger = 100;
@@ -55,13 +55,14 @@ contract Example {
 ## 实战演习
 我们的僵尸DNA将由一个十六位数字组成。
 定义 `dnaDigits` 为 `uint` 数据类型, 并赋值 `16`。
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
-uint dnaDigits = 16;
+	uint dnaDigits = 16;
 //这里开始
 }
+
 ```
 # 1.3 数学运算
 
@@ -75,7 +76,7 @@ uint dnaDigits = 16;
 
 Solidity 还支持 **_乘方操作_** (如：x 的 y次方） // 例如： 5 ** 2 = 25
 
-```js
+```solidity
 uint x = 5 ** 2; // equal to 5^2 = 25
 ```
 
@@ -84,7 +85,7 @@ uint x = 5 ** 2; // equal to 5^2 = 25
 为了保证我们的僵尸的DNA只含有16个字符，我们先造一个`uint`数据，让它等于10^16。这样一来以后我们可以用模运算符 `%` 把一个整数变成16位。
 
 1. 建立一个`uint`类型的变量，名字叫`dnaModulus`, 令其等于 **10 的 `dnaDigits` 次方**.
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
@@ -98,7 +99,7 @@ contract ZombieFactory {
 
 有时你需要更复杂的数据类型，Solidity 提供了 **结构体**:
 
-```js
+```solidity
 struct Person {
   uint age;
   string name;
@@ -115,9 +116,9 @@ struct Person {
 在我们的程序中，我们将创建一些僵尸！每个僵尸将拥有多个属性，所以这是一个展示结构体的完美例子。
 
 1. 建立一个`struct` 命名为 `Zombie`.
-    
+   
 2. 我们的 `Zombie` 结构体有两个属性： `name` (类型为 `string`), 和 `dna` (类型为 `uint`)。
-```js
+```solidity
 contract ZombieFactory {
 
     uint dnaDigits = 16;
@@ -134,7 +135,7 @@ contract ZombieFactory {
 
 如果你想建立一个集合，可以用 **数组**这样的数据类型. Solidity 支持两种数组: **_静态_** 数组和**动态**数组:
 
-```js
+```solidity
 // 固定长度为2的静态数组:
 uint[2] fixedArray;
 // 固定长度为5的string类型的静态数组:
@@ -145,7 +146,7 @@ uint[] dynamicArray;
 
 你也可以建立一个 **结构体**类型的数组 例如，上一章提到的 `Person`:
 
-```js
+```solidity
 Person[] people; // 这是动态数组，我们可以不断添加元素
 ```
 
@@ -155,7 +156,7 @@ Person[] people; // 这是动态数组，我们可以不断添加元素
 
 你可以定义 `public` 数组, Solidity 会自动创建 **_getter_** 方法. 语法如下:
 
-```js
+```solidity
 Person[] public people;
 ```
 
@@ -166,7 +167,7 @@ Person[] public people;
 为了把一个僵尸部队保存在我们的APP里，并且能够让其它APP看到这些僵尸，我们需要一个公共数组。
 
 1. 创建一个数据类型为 `Zombie` 的结构体数组，用 `public` 修饰，命名为：`zombies`.
-```js
+```solidity
 pragma solidity ^0.4.19;
 contract ZombieFactory {
     uint dnaDigits = 16;
@@ -187,7 +188,7 @@ contract ZombieFactory {
 
 在 Solidity 中函数定义的句法如下:
 
-```js
+```solidity
 function eatHamburgers(string _name, uint _amount) {
 
 }
@@ -199,7 +200,7 @@ function eatHamburgers(string _name, uint _amount) {
 
 我们的函数定义如下:
 
-```js
+```solidity
 eatHamburgers("vitalik", 100);
 ```
 
@@ -210,7 +211,7 @@ eatHamburgers("vitalik", 100);
 1. 建立一个函数 `createZombie`。 它有两个参数: **_name** (类型为`string`), 和 **_dna** (类型为`uint`)。
 
 暂时让函数空着——我们在后面会增加内容。
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
@@ -239,7 +240,7 @@ contract ZombieFactory {
 
 还记得上个例子中的 `Person` 结构吗？
 
-```js
+```solidity
 struct Person {
   uint age;
   string name;
@@ -250,7 +251,7 @@ Person[] public people;
 
 现在我们学习创建新的 `Person` 结构，然后把它加入到名为 `people` 的数组中.
 
-```js
+```solidity
 // 创建一个新的Person:
 Person satoshi = Person(172, "Satoshi");
 
@@ -260,13 +261,13 @@ people.push(satoshi);
 
 你也可以两步并一步，用一行代码更简洁:
 
-```js
+```solidity
 people.push(Person(16, "Vitalik"));
 ```
 
 > 注：`array.push()` 在数组的 **尾部** 加入新元素 ，所以元素在数组中的顺序就是我们添加的顺序， 如:
 
-```js
+```solidity
 uint[] numbers;
 numbers.push(5);
 numbers.push(10);
@@ -280,7 +281,7 @@ numbers.push(15);
 
 1. 在函数体里新创建一个 `Zombie`， 然后把它加入 `zombies` 数组中。 新创建的僵尸的 `name` 和 `dna`，来自于函数的参数。
 2. 让我们用一行代码简洁地完成它。
-```js
+```solidity
 contract ZombieFactory {
 
     uint dnaDigits = 16;
@@ -307,7 +308,7 @@ Solidity 定义的函数的属性默认为`公共`。 这就意味着任何一�
 
 如何定义一个私有的函数呢？
 
-```
+```solidity
 uint[] numbers;
 
 function _addToArray(uint _number) private {
@@ -324,7 +325,7 @@ function _addToArray(uint _number) private {
 我们合约的函数 `createZombie` 的默认属性是公共的，这意味着任何一方都可以调用它去创建一个僵尸。 咱们来把它变成私有吧！
 
 1. 变 `createZombie` 为私有函数，不要忘记遵守命名的规矩哦！
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
@@ -354,7 +355,7 @@ contract ZombieFactory {
 
 要想函数返回一个数值，按如下定义：
 
-```
+```solidity
 string greeting = "What's up dog";
 
 function sayHello() public returns (string) {
@@ -370,13 +371,13 @@ Solidity 里，函数的定义里可包含返回值的数据类型(如本例中�
 
 这种情况下我们可以把函数定义为 **_view_**, 意味着它只能读取数据不能更改数据:
 
-```
+```solidity
 function sayHello() public view returns (string) {
 ```
 
 Solidity 还支持 **_pure_** 函数, 表明这个函数甚至都不访问应用里的数据，例如：
 
-```
+```solidity
 function _multiply(uint a, uint b) private pure returns (uint) {
   return a * b;
 }
@@ -391,12 +392,12 @@ function _multiply(uint a, uint b) private pure returns (uint) {
 我们想建立一个帮助函数，它根据一个字符串随机生成一个DNA数据。
 
 1. 创建一个 `private` 函数，命名为 `_generateRandomDna`。它只接收一个输入变量 `_str` (类型 `string`), 返回一个 `uint` 类型的数值。
-    
+   
 2. 此函数只读取我们合约中的一些变量，所以标记为`view`。
-    
+   
 3. 函数内部暂时留空，以后我们再添加代码。
 
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
@@ -431,7 +432,7 @@ Ethereum 内部有一个散列函数`keccak256`，它用了SHA3版本。一个�
 
 例子:
 
-```js
+```solidity
 //6e91ec6b618bb462a4a6ee5aa2cb0e9cf30f7a052bb467b0ba58b8748c00d2e5
 keccak256("aaaab");
 //b1f078126895a1424524de5321b339ab00408010b7cf0e6ed451514981e58aa9
@@ -446,7 +447,7 @@ keccak256("aaaac");
 
 有时你需要变换数据类型。例如:
 
-```js
+```solidity
 uint8 a = 5;
 uint b = 6;
 // 将会抛出错误，因为 a * b 返回 uint, 而不是 uint8:
@@ -462,9 +463,9 @@ uint8 c = a * uint8(b);
 给 `_generateRandomDna` 函数添加代码! 它应该完成如下功能:
 
 1. 第一行代码取 `_str` 的 `keccak256` 散列值生成一个伪随机十六进制数，类型转换为 `uint`, 最后保存在类型为 `uint` 名为 `rand` 的变量中。
-    
+   
 2. 我们只想让我们的DNA的长度为16位 (还记得 `dnaModulus`?)。所以第二行代码应该 `return` 上面计算的数值对 `dnaModulus` 求余数(`%`)。
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
@@ -500,13 +501,13 @@ contract ZombieFactory {
 ## 实战演习
 
 1. 创建一个 `public` 函数，命名为 `createRandomZombie`. 它将被传入一个变量 `_name` (数据类型是 `string`)。 _(注: 定义公共函数 `public` 和定义一个私有 `private` 函数的做法一样)_。
-    
+   
 2. 函数的第一行应该调用 `_generateRandomDna` 函数，传入 `_name` 参数, 结果保存在一个类型为 `uint` 的变量里，命名为 `randDna`。
-    
+   
 3. 第二行调用 `_createZombie` 函数， 传入参数： `_name` 和 `randDna`。
-    
+   
 4. 整个函数应该是4行代码 (包括函数的结束符号 `}` )。
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
@@ -545,7 +546,7 @@ contract ZombieFactory {
 
 例子:
 
-```js
+```solidity
 // 这里建立事件
 event IntegersAdded(uint x, uint y, uint result);
 
@@ -559,7 +560,7 @@ function add(uint _x, uint _y) public {
 
 你的 app 前端可以监听这个事件。JavaScript 实现如下:
 
-```js
+```solidity
 YourContract.IntegersAdded(function(error, result) {
   // 干些事
 })
@@ -574,7 +575,7 @@ YourContract.IntegersAdded(function(error, result) {
 2。 修改 `_createZombie` 函数使得当新僵尸造出来并加入 `zombies`数组后，生成事件`NewZombie`。
 
 3。 需要定义僵尸`id`。 `array.push()` 返回数组的长度类型是`uint` - 因为数组的第一个元素的索引是 0， `array.push() - 1` 将是我们加入的僵尸的索引。 `zombies.push() - 1` 就是 `id`，数据类型是 `uint`。在下一行中你可以把它用到 `NewZombie` 事件中。
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
@@ -614,13 +615,13 @@ contract ZombieFactory {
 
 我们的 Solidity 合约完工了！ 现在我们要写一段 JavaScript 前端代码来调用这个合约。
 
-以太坊有一个 JavaScript 库，名为**_Web3.js_**。
+以太坊有一个 JavaScript 库，名为Web3.js。
 
 在后面的课程里，我们会进一步地教你如何安装一个合约，如何设置Web3.js。 但是现在我们通过一段代码来了解 Web3.js 是如何和我们发布的合约交互的吧。
 
 如果下面的代码你不能全都理解，不用担心。
 
-``` js
+``` solidity
 // 下面是调用合约的方式:
 var abi = /* abi是由编译器生成的 */
 var ZombieFactoryContract = web3.eth.contract(abi)

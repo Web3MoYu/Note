@@ -24,7 +24,7 @@
 
 映射是这样定义的：
 
-```js
+```solidity
 //对于金融应用程序，将用户的余额保存在一个 uint类型的变量中：
 mapping (address => uint) public accountBalance;
 //或者可以用来通过userId 存储/查找的用户名
@@ -41,7 +41,7 @@ mapping (uint => string) userIdToName;
 1.创建一个叫做 `zombieToOwner` 的映射。其键是一个`uint`（我们将根据它的 id 存储和查找僵尸），值为 `address`。映射属性为`public`。
 
 2.创建一个名为 `ownerZombieCount` 的映射，其中键是 `address`，值是 `uint`。
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
@@ -92,7 +92,7 @@ contract ZombieFactory {
 
 以下是使用 `msg.sender` 来更新 `mapping` 的例子：
 
-```js
+```solidity
 mapping (address => uint) favoriteNumber;
 
 function setMyNumber(uint _myNumber) public {
@@ -117,20 +117,20 @@ function whatIsMyNumber() public view returns (uint) {
 我们来修改第1课的 `_createZombie` 方法，将僵尸分配给函数调用者吧。
 
 1. 首先，在得到新的僵尸 `id` 后，更新 `zombieToOwner` 映射，在 `id` 下面存入 `msg.sender`。
-    
+   
 2. 然后，我们为这个 `msg.sender` 名下的 `ownerZombieCount` 加 1。
-    
+   
 
 跟在 JavaScript 中一样， 在 Solidity 中你也可以用 `++` 使 `uint` 递增。
 
-```js
+```solidity
 uint number = 0;
 number++;
 // `number` 现在是 `1`了
 ```
 
 修改两行代码即可。
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
@@ -179,7 +179,7 @@ contract ZombieFactory {
 
 答案是使用`require`。 `require`使得函数在执行过程中，当不满足某些条件时抛出错误，并停止执行：
 
-```js
+```solidity
 function sayHiToVitalik(string _name) public returns (string) {
   // 比较 _name 是否等于 "Vitalik". 如果不成立，抛出异常并终止程序
   // (敲黑板: Solidity 并不支持原生的字符串比较, 我们只能通过比较
@@ -207,7 +207,7 @@ function sayHiToVitalik(string _name) public returns (string) {
 > - 虽然参数的两个位置是等效的。 但是，由于我们的答案检查器比较呆板，它只能认定其中一个为正确答案
 > - 于是在这里，我们就约定把`ownerZombieCount [msg.sender]`放前面吧
 
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
@@ -253,7 +253,7 @@ contract ZombieFactory {
 
 有个让 Solidity 的代码易于管理的功能，就是合约 **_inheritance_** (继承)：
 
-```js
+```solidity
 contract Doge {
   function catchphrase() public returns (string) {
     return "So Wow CryptoDoge";
@@ -276,7 +276,7 @@ contract BabyDoge is Doge {
 在接下来的章节中，我们将要为僵尸实现各种功能，让它可以“猎食”和“繁殖”。 通过将这些运算放到父类 `ZombieFactory` 中，使得所有 `ZombieFactory` 的继承者合约都可以使用这些方法。
 
 1. 在 `ZombieFactory` 下创建一个叫 `ZombieFeeding` 的合约，它是继承自 `ZombieFactory 合约的。
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 contract ZombieFactory {
@@ -329,7 +329,7 @@ contract ZombieFeeding is ZombieFactory {
 
 在 Solidity 中，当你有多个文件并且想把一个文件导入另一个文件时，可以使用 `import` 语句：
 
-```
+```solidity
 import "./someothercontract.sol";
 
 contract newContract is SomeOtherContract {
@@ -345,7 +345,7 @@ contract newContract is SomeOtherContract {
 
 1.将 `zombiefactory.sol` 导入到我们的新文件 `zombiefeeding.sol` 中。
 
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 // put import statement here
@@ -365,7 +365,7 @@ contract ZombieFeeding is ZombieFactory {
 
 然而也有一些情况下，你需要手动声明存储类型，主要用于处理函数内的 **结构体 ** 和 ** 数组 ** 时：
 
-```js
+```solidity
 contract SandwichFactory {
   struct Sandwich {
     string name;
@@ -411,9 +411,9 @@ contract SandwichFactory {
 当一个僵尸猎食其他生物体时，它自身的DNA将与猎物生物的DNA结合在一起，形成一个新的僵尸DNA。
 
 1. 创建一个名为 `feedAndMultiply` 的函数。 使用两个参数：`_zombieId`（ `uint`类型 ）和`_targetDna` （也是 `uint` 类型）。 设置属性为 `public` 的。
-    
+   
 2. 我们不希望别人用我们的僵尸去捕猎。 首先，我们确保对自己僵尸的所有权。 通过添加一个`require` 语句来确保 `msg.sender` 只能是这个僵尸的主人（类似于我们在 `createRandomZombie` 函数中做过的那样）。
-    
+   
 
 > 注意：同样，因为我们的答案检查器比较呆萌，只认识把 `msg.sender` 放在前面的答案，如果你切换了参数的顺序，它就不认得了。 但你正常编码时，如何安排参数顺序都是正确的。
 
@@ -422,7 +422,7 @@ contract SandwichFactory {
 到目前为止，包括函数结束符 `}` 的那一行， 总共4行代码。
 
 下一章里，我们会继续丰富这个功能。
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 import "./zombiefactory.sol";
@@ -444,7 +444,7 @@ contract ZombieFeeding is ZombieFactory {
 
 例如：
 
-```
+```solidity
 function testDnaSplicing() public {
   uint zombieDna = 2222222222222222;
   uint targetDna = 4444444444444444;
@@ -458,9 +458,9 @@ function testDnaSplicing() public {
 ## 实战演习
 
 1. 首先我们确保 `_targetDna` 不长于16位。要做到这一点，我们可以设置 `_targetDna` 为 `_targetDna ％ dnaModulus` ，并且只取其最后16位数字。
-    
+   
 2. 接下来为我们的函数声明一个名叫 `newDna` 的 `uint`类型的变量，并将其值设置为 `myZombie`的 DNA 和 `_targetDna` 的平均值（如上例所示）。
-    
+   
 
 > 注意：您可以用 `myZombie.name` 或 `myZombie.dna` 访问 `myZombie` 的属性。
 
@@ -468,7 +468,7 @@ function testDnaSplicing() public {
 
 > 注意：对于 Solidity 高手，你可能会注意到我们的代码存在一个问题。别担心，下一章会解决这个问题的 ;）
 
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 import "./zombiefactory.sol";
@@ -503,7 +503,7 @@ contract ZombieFeeding is ZombieFactory {
 
 声明函数 `internal` 或 `external` 类型的语法，与声明 `private` 和 `public`类 型相同：
 
-```js
+```solidity
 contract Sandwich {
   uint private sandwichesEaten = 0;
 
@@ -547,7 +547,7 @@ Crypto 僵尸喜欢吃的是...
 
 先举一个简单的栗子。 假设在区块链上有这么一个合约：
 
-```js
+```solidity
 contract LuckyNumber {
   mapping(address => uint) numbers;
 
@@ -567,7 +567,7 @@ contract LuckyNumber {
 
 首先，我们定义 `LuckyNumber` 合约的 **_interface_** ：
 
-```js
+```solidity
 contract NumberInterface {
   function getNum(address _myAddress) public view returns (uint);
 }
@@ -591,7 +591,7 @@ contract NumberInterface {
 
 该函数如下所示：
 
-```js
+```solidity
 function getKitty(uint256 _id) external view returns (
     bool isGestating,
     bool isReady,
@@ -627,7 +627,7 @@ function getKitty(uint256 _id) external view returns (
 1.定义一个名为 `KittyInterface` 的接口。 请注意，因为我们使用了 `contract` 关键字， 这过程看起来就像创建一个新的合约一样。
 
 2.在interface里定义了 `getKitty` 函数（不过是复制/粘贴上面的函数，但在 `returns` 语句之后用分号，而不是大括号内的所有内容。
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 import "./zombiefactory.sol";
@@ -662,7 +662,7 @@ contract ZombieFeeding is ZombieFactory {
 
 继续前面 `NumberInterface` 的例子，我们既然将接口定义为：
 
-```js
+```solidity
 contract NumberInterface {
   function getNum(address _myAddress) public view returns (uint);
 }
@@ -670,7 +670,7 @@ contract NumberInterface {
 
 我们可以在合约中这样使用：
 
-```js
+```solidity
 contract MyContract {
   address NumberInterfaceAddress = 0xab38...;
   // ^ 这是FavoriteNumber合约在以太坊上的地址
@@ -692,7 +692,7 @@ contract MyContract {
 我们来建个自己的合约去读取另一个智能合约-- CryptoKitties 的内容吧！
 
 1. 我已经将代码中 CryptoKitties 合约的地址保存在一个名为 `ckAddress` 的变量中。在下一行中，请创建一个名为 `kittyContract` 的 KittyInterface，并用 `ckAddress` 为它初始化 —— 就像我们为 `numberContract`所做的一样。
-```js
+```solidity
 pragma solidity ^0.4.19;
 
 import "./zombiefactory.sol";
@@ -725,3 +725,43 @@ contract ZombieFeeding is ZombieFactory {
   }
 }
 ```
+# 2.11 处理多返回值
+
+`getKitty` 是我们所看到的第一个返回多个值的函数。我们来看看是如何处理的：
+
+```solidity
+function multipleReturns() internal returns(uint a, uint b, uint c) {
+  return (1, 2, 3);
+}
+
+function processMultipleReturns() external {
+  uint a;
+  uint b;
+  uint c;
+  // 这样来做批量赋值:
+  (a, b, c) = multipleReturns();
+}
+
+// 或者如果我们只想返回其中一个变量:
+function getLastReturnValue() external {
+  uint c;
+  // 可以对其他字段留空:
+  (,,c) = multipleReturns();
+}
+```
+
+# 实战演习
+
+是时候与 CryptoKitties 合约交互起来了！
+
+我们来定义一个函数，从 kitty 合约中获取它的基因：
+
+1. 创建一个名为 `feedOnKitty` 的函数。它需要2个 `uint` 类型的参数，`_zombieId` 和`_kittyId` ，这是一个 `public` 类型的函数。
+   
+2. 函数首先要声明一个名为 `kittyDna` 的 `uint`。
+   
+    > 注意：在我们的 `KittyInterface` 中，`genes` 是一个 `uint256` 类型的变量，但是如果你记得，我们在第一课中提到过，`uint` 是 `uint256` 的别名，也就是说它们是一回事。
+    
+3. 这个函数接下来调用 `kittyContract.getKitty`函数, 传入 `_kittyId` ，将返回的 `genes` 存储在 `kittyDna` 中。记住 —— `getKitty` 会返回一大堆变量。 （确切地说10个 - 我已经为你数过了，不错吧！）。但是我们只关心最后一个-- `genes`。数逗号的时候小心点哦！
+   
+4. 最后，函数调用了 `feedAndMultiply` ，并传入了 `_zombieId` 和 `kittyDna` 两个参数。
