@@ -41,6 +41,7 @@ mapping (uint => string) userIdToName;
 1.创建一个叫做 `zombieToOwner` 的映射。其键是一个`uint`（我们将根据它的 id 存储和查找僵尸），值为 `address`。映射属性为`public`。
 
 2.创建一个名为 `ownerZombieCount` 的映射，其中键是 `address`，值是 `uint`。
+
 ```solidity
 pragma solidity ^0.4.19;
 
@@ -205,7 +206,7 @@ function sayHiToVitalik(string _name) public returns (string) {
 > 注意：在 Solidity 中，关键词放置的顺序并不重要
 > 
 > - 虽然参数的两个位置是等效的。 但是，由于我们的答案检查器比较呆板，它只能认定其中一个为正确答案
-> - 于是在这里，我们就约定把`ownerZombieCount [msg.sender]`放前面吧
+> - 于是在这里，我们就约定把`ownerZombieCount[msg.sender]`放前面吧
 
 ```solidity
 pragma solidity ^0.4.19;
@@ -363,7 +364,7 @@ contract ZombieFeeding is ZombieFactory {
 
 大多数时候你都用不到这些关键字，默认情况下 Solidity 会自动处理它们。 状态变量（在函数之外声明的变量）默认为“存储”形式，并永久写入区块链；而在函数内部声明的变量是“内存”型的，它们函数调用结束后消失。
 
-然而也有一些情况下，你需要手动声明存储类型，主要用于处理函数内的 **结构体 ** 和 ** 数组 ** 时：
+然而也有一些情况下，你需要手动声明存储类型，主要用于处理函数内的 **结构体 ** 和数组时：
 
 ```solidity
 contract SandwichFactory {
@@ -750,7 +751,7 @@ function getLastReturnValue() external {
 }
 ```
 
-# 实战演习
+## 实战演习
 
 是时候与 CryptoKitties 合约交互起来了！
 
@@ -765,3 +766,134 @@ function getLastReturnValue() external {
 3. 这个函数接下来调用 `kittyContract.getKitty`函数, 传入 `_kittyId` ，将返回的 `genes` 存储在 `kittyDna` 中。记住 —— `getKitty` 会返回一大堆变量。 （确切地说10个 - 我已经为你数过了，不错吧！）。但是我们只关心最后一个-- `genes`。数逗号的时候小心点哦！
    
 4. 最后，函数调用了 `feedAndMultiply` ，并传入了 `_zombieId` 和 `kittyDna` 两个参数。
+
+```solidity
+pragma solidity ^0.4.19;
+
+import "./zombiefactory.sol";
+
+contract KittyInterface {
+  function getKitty(uint256 _id) external view returns (
+    bool isGestating,
+    bool isReady,
+    uint256 cooldownIndex,
+    uint256 nextActionAt,
+    uint256 siringWithId,
+    uint256 birthTime,
+    uint256 matronId,
+    uint256 sireId,
+    uint256 generation,
+    uint256 genes
+  );
+}
+
+contract ZombieFeeding is ZombieFactory {
+
+  address ckAddress = 0x06012c8cf97BEaD5deAe237070F9587f8E7A266d;
+  KittyInterface kittyContract = KittyInterface(ckAddress);
+
+  function feedAndMultiply(uint _zombieId, uint _targetDna) public {
+    require(msg.sender == zombieToOwner[_zombieId]);
+    Zombie storage myZombie = zombies[_zombieId];
+    _targetDna = _targetDna % dnaModulus;
+    uint newDna = (myZombie.dna + _targetDna) / 2;
+    _createZombie("NoName", newDna);
+  }
+
+  // define function here
+  function feedOnKitty(uint _zombieId, uint _kittyId) public {
+    uint kittyDna;
+    (,,,,,,,,,kittyDna) = kittyContract.getKitty(_kittyId);
+    feedAndMultiply(_zombieId, kittyDna);
+  }
+}
+
+```
+
+# 2.12  奖励: Kitty 基因
+
+我们的功能逻辑主体已经完成了...现在让我们来添一个奖励功能吧。
+
+这样吧，给从小猫制造出的僵尸添加些特征，以显示他们是猫僵尸。
+
+要做到这一点，咱们在新僵尸的DNA中添加一些特殊的小猫代码。
+
+还记得吗，第一课中我们提到，我们目前只使用16位DNA的前12位数来指定僵尸的外观。所以现在我们可以使用最后2个数字来处理“特殊”的特征。
+
+这样吧，把猫僵尸DNA的最后两个数字设定为`99`（因为猫有9条命）。所以在我们这么来写代码：`如果`这个僵尸是一只猫变来的，就将它DNA的最后两位数字设置为`99`。
+
+## if 语句
+
+if语句的语法在 Solidity 中，与在 JavaScript 中差不多：
+
+```
+function eatBLT(string sandwich) public {
+  // 看清楚了，当我们比较字符串的时候，需要比较他们的 keccak256 哈希码
+  if (keccak256(sandwich) == keccak256("BLT")) {
+    eat();
+  }
+}
+```
+
+## 实战演习
+
+让我们在我们的僵尸代码中实现小猫的基因。
+
+1. 首先，我们修改下 `feedAndMultiply` 函数的定义，给它传入第三个参数：一条名为 `_species` 的字符串。
+
+2. 接下来，在我们计算出新的僵尸的DNA之后，添加一个 `if` 语句来比较 `_species` 和字符串 `"kitty"` 的 `keccak256` 哈希值。
+
+3. 在 `if` 语句中，我们用 `99` 替换了新僵尸DNA的最后两位数字。可以这么做：`newDna = newDna - newDna % 100 + 99;`。
+
+   > 解释：假设 `newDna` 是 `334455`。那么 `newDna % 100` 是 `55`，所以 `newDna - newDna % 100` 得到 `334400`。最后加上 `99` 可得到 `334499`。
+
+4. 最后，我们修改了 `feedOnKitty` 中的函数调用。当它调用 `feedAndMultiply` 时，增加 `“kitty”` 作为最后一个参数。
+
+```solidity
+pragma solidity ^0.4.19;
+
+import "./zombiefactory.sol";
+
+contract KittyInterface {
+  function getKitty(uint256 _id) external view returns (
+    bool isGestating,
+    bool isReady,
+    uint256 cooldownIndex,
+    uint256 nextActionAt,
+    uint256 siringWithId,
+    uint256 birthTime,
+    uint256 matronId,
+    uint256 sireId,
+    uint256 generation,
+    uint256 genes
+  );
+}
+
+contract ZombieFeeding is ZombieFactory {
+
+  address ckAddress = 0x06012c8cf97BEaD5deAe237070F9587f8E7A266d;
+  KittyInterface kittyContract = KittyInterface(ckAddress);
+
+  // 这里修改函数定义
+  function feedAndMultiply(uint _zombieId, uint _targetDna, string _species) public {
+    require(msg.sender == zombieToOwner[_zombieId]);
+    Zombie storage myZombie = zombies[_zombieId];
+    _targetDna = _targetDna % dnaModulus;
+    uint newDna = (myZombie.dna + _targetDna) / 2;
+    // 这里增加一个 if 语句
+    if (keccak256(_species) == keccak256("kitty")) {
+      newDna = newDna - newDna % 100 + 99;
+    }
+    _createZombie("NoName", newDna);
+  }
+
+  function feedOnKitty(uint _zombieId, uint _kittyId) public {
+    uint kittyDna;
+    (,,,,,,,,,kittyDna) = kittyContract.getKitty(_kittyId);
+    // 并修改函数调用
+    feedAndMultiply(_zombieId, kittyDna, "kitty");
+  }
+
+}
+```
+

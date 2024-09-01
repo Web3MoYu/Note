@@ -3,6 +3,7 @@
 
 Solidity 的代码都包裹在**合约**里面. 一份`合约`就是以太应币应用的基本模块， 所有的变量和函数都属于一份合约, 它是你所有应用的起点.
 一份名为 `HelloWorld` 的空合约如下:
+
 ```solidity
 contract HelloWorld {
 
@@ -104,7 +105,6 @@ struct Person {
   uint age;
   string name;
 }
-
 ```
 
 结构体允许你生成一个更复杂的数据类型，它有多个属性。
@@ -173,11 +173,8 @@ contract ZombieFactory {
     uint dnaDigits = 16;
     uint dnaModulus = 10 ** dnaDigits;
     struct Zombie {
-
         string name;
-
         uint dna;
-
     }
     // 这里开始
     Zombie[] public zombies;
@@ -575,6 +572,7 @@ YourContract.IntegersAdded(function(error, result) {
 2。 修改 `_createZombie` 函数使得当新僵尸造出来并加入 `zombies`数组后，生成事件`NewZombie`。
 
 3。 需要定义僵尸`id`。 `array.push()` 返回数组的长度类型是`uint` - 因为数组的第一个元素的索引是 0， `array.push() - 1` 将是我们加入的僵尸的索引。 `zombies.push() - 1` 就是 `id`，数据类型是 `uint`。在下一行中你可以把它用到 `NewZombie` 事件中。
+
 ```solidity
 pragma solidity ^0.4.19;
 
