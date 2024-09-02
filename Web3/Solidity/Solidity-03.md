@@ -201,7 +201,7 @@ contract ZombieFactory is Ownable{
 
 ```
 
-# 3.3 onlyOwner 函数修饰符
+# 3.3 onlyOwner 函数修饰符 (modifier)
 
 现在我们有了个基本版的合约 `ZombieFactory` 了，它继承自 `Ownable` 接口，我们也可以给 `ZombieFeeding` 加上 `onlyOwner` 函数修饰符。
 
