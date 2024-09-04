@@ -256,3 +256,387 @@ uint random2 = uint(keccak256(now, msg.sender, randNonce)) % 100;
 2. 建立一个函数，命名为 `randMod` (random-modulus)。它将作为`internal` 函数，传入一个名为 `_modulus`的 `uint`，并 `returns` 一个 `uint`。
 3. 这个函数首先将为 `randNonce`加一， (使用 `randNonce++` 语句)。
 4. 最后，它应该 (在一行代码中) 计算 `now`, `msg.sender`, 以及 `randNonce` 的 `keccak256` 哈希值并转换为 `uint`—— 最后 `return` `% _modulus` 的值。 （天! 听起来太拗口了。如果你有点理解不过来，看一下我们上面计算随机数的例子，它们的逻辑非常相似）
+
+```solidity
+pragma solidity ^0.4.19;
+
+import "./zombiehelper.sol";
+
+contract ZombieBattle is ZombieHelper {
+  // 在这里开始
+  uint randNonce = 0;
+
+  function randMod(uint _modulus) internal returns(uint) {
+    randNonce++;
+    return uint(keccak256(now, msg.sender, randNonce)) % _modulus;
+  }
+}
+```
+
+# 4.4 僵尸对战
+
+我们的合约已经有了一些随机性的来源，可以用进我们的僵尸战斗中去计算结果。
+
+我们的僵尸战斗看起来将是这个流程：
+
+- 你选择一个自己的僵尸，然后选择一个对手的僵尸去攻击。
+- 如果你是攻击方，你将有70%的几率获胜，防守方将有30%的几率获胜。
+- 所有的僵尸（攻守双方）都将有一个 `winCount` 和一个 `lossCount`，这两个值都将根据战斗结果增长。
+- 若攻击方获胜，这个僵尸将升级并产生一个新僵尸。
+- 如果攻击方失败，除了失败次数将加一外，什么都不会发生。
+- 无论输赢，当前僵尸的冷却时间都将被激活。
+
+这有一大堆的逻辑需要处理，我们将把这些步骤分解到接下来的课程中去。
+
+## 实战演习
+
+1. 给我们合约一个 `uint` 类型的变量，命名为 `attackVictoryProbability`, 将其值设定为 `70`。
+2. 创建一个名为 `attack`的函数。它将传入两个参数: `_zombieId` (`uint` 类型) 以及 `_targetId` (也是 `uint`)。它将是一个 `external` 函数。
+
+函数体先留空吧。
+
+```solidity
+pragma solidity ^0.4.19;
+
+import "./zombiehelper.sol";
+
+contract ZombieBattle is ZombieHelper {
+  uint randNonce = 0;
+  // 在这里创建 attackVictoryProbability
+  uint attackVictoryProbability = 70;
+
+  function randMod(uint _modulus) internal returns(uint) {
+    randNonce++;
+    return uint(keccak256(now, msg.sender, randNonce)) % _modulus;
+  }
+
+  // 在这里创建新函数
+  function attack(uint _zombieId, uint _targetId) external {
+
+  }
+}
+```
+
+# 4.5 重构通用逻辑
+
+不管谁调用我们的 `attack` 函数 —— 我们想确保用户的确拥有他们用来攻击的僵尸。如果你能用其他人的僵尸来攻击将是一个很大的安全问题。
+
+你能想一下我们如何添加一个检查步骤来看看调用这个函数的人就是他们传入的 `_zombieId` 的拥有者么？
+
+想一想，看看你能不能自己找到一些答案。
+
+花点时间…… 参考我们前面课程的代码来获得灵感。
+
+答案在下面，在你有一些想法之前不要继续阅读。
+
+## 答案
+
+我们在前面的课程里面已经做过很多次这样的检查了。 在 `changeName()`, `changeDna()`, 和 `feedAndMultiply()`里，我们做过这样的检查：
+
+```solidity
+require(msg.sender == zombieToOwner[_zombieId]);
+```
+
+这和我们 `attack` 函数将要用到的检查逻辑是相同的。 正因我们要多次调用这个检查逻辑，让我们把它移到它自己的 `modifier` 中来清理代码并避免重复编码。
+
+## 实战演习
+
+我们回到了 `zombiefeeding.sol`， 因为这是我们第一次调用检查逻辑的地方。让我们把它重构进它自己的 `modifier`。
+
+1. 创建一个 `modifier`， 命名为 `ownerOf`。它将传入一个参数， `_zombieId` (一个 `uint`)。
+
+   它的函数体应该 `require` `msg.sender` 等于 `zombieToOwner[_zombieId]`， 然后继续这个函数剩下的内容。 如果你忘记了修饰符的写法，可以参考 `zombiehelper.sol`。
+
+2. 将这个函数的 `feedAndMultiply` 定义修改为其使用修饰符 `ownerOf`。
+
+3. 现在我们使用 `modifier`了，你可以删除这行了： `require(msg.sender == zombieToOwner[_zombieId]);`
+
+```solidity
+pragma solidity ^0.4.19;
+
+import "./zombiefactory.sol";
+
+contract KittyInterface {
+  function getKitty(uint256 _id) external view returns (
+    bool isGestating,
+    bool isReady,
+    uint256 cooldownIndex,
+    uint256 nextActionAt,
+    uint256 siringWithId,
+    uint256 birthTime,
+    uint256 matronId,
+    uint256 sireId,
+    uint256 generation,
+    uint256 genes
+  );
+}
+
+contract ZombieFeeding is ZombieFactory {
+
+  KittyInterface kittyContract;
+
+  // 1. 在这里创建 modifier
+  modifier ownerOf(uint _zombieId) {
+    require(msg.sender == zombieToOwner[_zombieId]);
+    _;
+  }
+  function setKittyContractAddress(address _address) external onlyOwner {
+    kittyContract = KittyInterface(_address);
+  }
+
+  function _triggerCooldown(Zombie storage _zombie) internal {
+    _zombie.readyTime = uint32(now + cooldownTime);
+  }
+
+  function _isReady(Zombie storage _zombie) internal view returns (bool) {
+      return (_zombie.readyTime <= now);
+  }
+
+  // 2. 在函数定义时增加 modifier :
+  function feedAndMultiply(uint _zombieId, uint _targetDna, string _species) internal ownerOf(_zombieId) {
+    // 3. 移除这一行
+    Zombie storage myZombie = zombies[_zombieId];
+    require(_isReady(myZombie));
+    _targetDna = _targetDna % dnaModulus;
+    uint newDna = (myZombie.dna + _targetDna) / 2;
+    if (keccak256(_species) == keccak256("kitty")) {
+      newDna = newDna - newDna % 100 + 99;
+    }
+    _createZombie("NoName", newDna);
+    _triggerCooldown(myZombie);
+  }
+
+  function feedOnKitty(uint _zombieId, uint _kittyId) public {
+    uint kittyDna;
+    (,,,,,,,,,kittyDna) = kittyContract.getKitty(_kittyId);
+    feedAndMultiply(_zombieId, kittyDna, "kitty");
+  }
+}
+```
+
+# 4.6 回到攻击！
+
+重构完成了，回到 `zombieattack.sol`。
+
+继续来完善我们的 `attack` 函数， 现在我们有了 `ownerOf` 修饰符来用了。
+
+## 实战演习
+
+1. 将 `ownerOf` 修饰符添加到 `attack` 来确保调用者拥有`_zombieId`.
+
+2. 我们的函数所需要做的第一件事就是获得一个双方僵尸的 `storage` 指针， 这样我们才能很方便和它们交互：
+
+   a. 定义一个 `Zombie storage` 命名为 `myZombie`，使其值等于 `zombies[_zombieId]`。
+
+   b. 定义一个 `Zombie storage` 命名为 `enemyZombie`， 使其值等于 `zombies[_targetId]`。
+
+3. 我们将用一个0到100的随机数来确定我们的战斗结果。 定义一个 `uint`，命名为 `rand`， 设定其值等于 `randMod` 函数的返回值，此函数传入 `100`作为参数。
+
+```solidity
+pragma solidity ^0.4.19;
+
+import "./zombiehelper.sol";
+
+contract ZombieBattle is ZombieHelper {
+  uint randNonce = 0;
+  uint attackVictoryProbability = 70;
+
+  function randMod(uint _modulus) internal returns(uint) {
+    randNonce++;
+    return uint(keccak256(now, msg.sender, randNonce)) % _modulus;
+  }
+
+  // 1. 在这里增加 modifier
+  function attack(uint _zombieId, uint _targetId) external ownerOf(_zombieId) {
+    // 2. 在这里开始定义函数
+    Zombie storage myZombie = zombies[_zombieId];
+    Zombie storage enemyZombie = zombies[_targetId];
+    uint rand = randMod(100);
+  }
+}
+```
+
+# 4.7 僵尸的输赢
+
+对我们的僵尸游戏来说，我们将要追踪我们的僵尸输赢了多少场。有了这个我们可以在游戏里维护一个 "僵尸排行榜"。
+
+有多种方法在我们的DApp里面保存一个数值 — 作为一个单独的映射，作为一个“排行榜”结构体，或者保存在 `Zombie` 结构体内。
+
+每个方法都有其优缺点，取决于我们打算如何和这些数据打交道。在这个教程中，简单起见我们将这个状态保存在 `Zombie` 结构体中，将其命名为 `winCount` 和 `lossCount`。
+
+我们跳回 `zombiefactory.sol`, 将这些属性添加进 `Zombie` 结构体.
+
+## 实战演习
+
+1. 修改 `Zombie` 结构体，添加两个属性:
+
+   a. `winCount`, 一个 `uint16`
+
+   b. `lossCount`, 也是一个 `uint16`
+
+   > 注意： 记住, 因为我们能在结构体中包装`uint`, 我们打算用适合我们的最小的 `uint`。 一个 `uint8` 太小了， 因为 2^8 = 256 —— 如果我们的僵尸每天都作战，不到一年就溢出了。但是 2^16 = 65536 （`uint16`）—— 除非一个僵尸连续179年每天作战，否则我们就是安全的。
+
+2. 现在我们的 `Zombie` 结构体有了新的属性， 我们需要修改 `_createZombie()` 中的函数定义。
+
+   修改僵尸生成定义，让每个新僵尸都有 `0` 赢和 `0` 输。
+
+```solidity
+pragma solidity ^0.4.19;
+
+import "./ownable.sol";
+
+contract ZombieFactory is Ownable {
+
+    event NewZombie(uint zombieId, string name, uint dna);
+
+    uint dnaDigits = 16;
+    uint dnaModulus = 10 ** dnaDigits;
+    uint cooldownTime = 1 days;
+
+    struct Zombie {
+      string name;
+      uint dna;
+      uint32 level;
+      uint32 readyTime;
+      // 1. 在这里添加新的属性
+      uint16 winCount;
+      uint16 lossCount;
+    }
+
+    Zombie[] public zombies;
+
+    mapping (uint => address) public zombieToOwner;
+    mapping (address => uint) ownerZombieCount;
+
+    function _createZombie(string _name, uint _dna) internal {
+        // 2. 在这里修改修改新僵尸的创建:
+        uint id = zombies.push(Zombie(_name, _dna, 1, uint32(now + cooldownTime), 0, 0)) - 1;
+        zombieToOwner[id] = msg.sender;
+        ownerZombieCount[msg.sender]++;
+        NewZombie(id, _name, _dna);
+    }
+
+    function _generateRandomDna(string _str) private view returns (uint) {
+        uint rand = uint(keccak256(_str));
+        return rand % dnaModulus;
+    }
+
+    function createRandomZombie(string _name) public {
+        require(ownerZombieCount[msg.sender] == 0);
+        uint randDna = _generateRandomDna(_name);
+        randDna = randDna - randDna % 100;
+        _createZombie(_name, randDna);
+    }
+}
+```
+
+# 4.8 僵尸胜利了 😄
+
+有了 `winCount` 和 `lossCount`，我们可以根据僵尸哪个僵尸赢了战斗来更新它们了。
+
+在第六章我们计算出来一个0到100的随机数。现在让我们用那个数来决定那谁赢了战斗，并以此更新我们的状态。
+
+## 实战演习
+
+1. 创建一个 `if` 语句来检查 `rand` 是不是 ***小于或者等于\*** `attackVictoryProbability`。
+
+2. 如果以上条件为 `true`， 我们的僵尸就赢了！所以：
+
+   a. 增加 `myZombie` 的 `winCount`。
+
+   b. 增加 `myZombie` 的 `level`。 (升级了啦!!!!!!!)
+
+   c. 增加 `enemyZombie` 的 `lossCount`. (输家!!!!!! 😫 😫 😫)
+
+   d. 运行 `feedAndMultiply` 函数。 在 `zombiefeeding.sol` 里查看调用它的语句。 对于第三个参数 (`_species`)，传入字符串 "zombie". （现在它实际上什么都不做，不过在稍后， 如果我们愿意，可以添加额外的方法，用来制造僵尸变的僵尸）。
+
+```solidity
+pragma solidity ^0.4.19;
+
+import "./zombiehelper.sol";
+
+contract ZombieBattle is ZombieHelper {
+  uint randNonce = 0;
+  uint attackVictoryProbability = 70;
+
+  function randMod(uint _modulus) internal returns(uint) {
+    randNonce++;
+    return uint(keccak256(now, msg.sender, randNonce)) % _modulus;
+  }
+
+  function attack(uint _zombieId, uint _targetId) external ownerOf(_zombieId) {
+    Zombie storage myZombie = zombies[_zombieId];
+    Zombie storage enemyZombie = zombies[_targetId];
+    uint rand = randMod(100);
+    // 在这里开始
+    if (rand <= attackVictoryProbability){
+      myZombie.winCount++;
+      myZombie.level++;
+      enemyZombie.lossCount++;
+      feedAndMultiply(_zombieId, enemyZombie.dna, "zombie");
+    }
+  }
+}
+```
+
+# 4.9 僵尸失败 😞
+
+我们已经编写了你的僵尸赢了之后会发生什么， 该看看 **输了** 的时候要怎么做了。
+
+在我们的游戏中，僵尸输了后并不会降级 —— 只是简单地给 `lossCount` 加一，并触发冷却，等待一天后才能再次参战。
+
+要实现这个逻辑，我们需要一个 `else` 语句。
+
+`else` 语句和 JavaScript 以及很多其他语言的 else 语句一样。
+
+```solidity
+if (zombieCoins[msg.sender] > 100000000) {
+  // 你好有钱!!!
+} else {
+  // 我们需要更多的僵尸币...
+}
+```
+
+## 实战演习
+
+1. 添加一个 `else` 语句。 若我们的僵尸输了：
+
+   a. 增加 `myZombie` 的 `lossCount`。
+
+   b. 增加 `enemyZombie` 的 `winCount`。
+
+2. 在 `else` 最后， 对 `myZombie` 运行 `_triggerCooldown` 方法。这让每个僵尸每天只能参战一次。
+
+```solidity
+pragma solidity ^0.4.19;
+
+import "./zombiehelper.sol";
+
+contract ZombieBattle is ZombieHelper {
+  uint randNonce = 0;
+  uint attackVictoryProbability = 70;
+
+  function randMod(uint _modulus) internal returns(uint) {
+    randNonce++;
+    return uint(keccak256(now, msg.sender, randNonce)) % _modulus;
+  }
+
+  function attack(uint _zombieId, uint _targetId) external ownerOf(_zombieId) {
+    Zombie storage myZombie = zombies[_zombieId];
+    Zombie storage enemyZombie = zombies[_targetId];
+    uint rand = randMod(100);
+    if (rand <= attackVictoryProbability) {
+      myZombie.winCount++;
+      myZombie.level++;
+      enemyZombie.lossCount++;
+      feedAndMultiply(_zombieId, enemyZombie.dna, "zombie");
+    } else {
+      myZombie.lossCount++;
+      enemyZombie.winCount++;
+      _triggerCooldown(myZombie);
+    }
+      // 在这里开始
+  }
+}
+```
+
