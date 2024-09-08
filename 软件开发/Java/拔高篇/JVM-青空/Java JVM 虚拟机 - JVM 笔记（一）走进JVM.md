@@ -373,8 +373,17 @@ deb http://archive.ubuntu.com/ubuntu xenial universe
 接着更新一下apt源信息，并安装gcc和g++：
 
 ```sh
-sudo apt update
-sudo apt install gcc-4.8 g++-4.8
+ wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-4.8/g++-4.8_4.8.5-4ubuntu8_amd64.deb 
+ wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-4.8/libstdc++-4.8-dev_4.8.5-4ubuntu8_amd64.deb 
+ wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-4.8/gcc-4.8-base_4.8.5-4ubuntu8_amd64.deb 
+ wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-4.8/gcc-4.8_4.8.5-4ubuntu8_amd64.deb 
+ wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-4.8/libgcc-4.8-dev_4.8.5-4ubuntu8_amd64.deb 
+ wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-4.8/cpp-4.8_4.8.5-4ubuntu8_amd64.deb 
+ wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-4.8/libasan0_4.8.5-4ubuntu8_amd64.deb 
+ sudo apt install ./gcc-4.8_4.8.5-4ubuntu8_amd64.deb ./gcc-4.8-base_4.8.5-4ubuntu8_amd64.deb ./libstdc++-4.8-dev_4.8.5-4ubuntu8_amd64.deb ./cpp-4.8_4.8.5-4ubuntu8_amd64.deb ./libgcc-4.8-dev_4.8.5-4ubuntu8_amd64.deb ./libasan0_4.8.5-4ubuntu8_amd64.deb ./g++-4.8_4.8.5-4ubuntu8_amd64.deb
+ sudo apt update
+ sudo apt-get install gcc-4.8 g++-4.8
+
 ```
 
 接着配置：
@@ -462,6 +471,7 @@ unzip jdk-jdk8-b120.zip
 
 ```sh
 bash configure --with-debug-level=slowdebug --enable-debug-symbols ZIP_DEBUGINFO_FIELS=0
+bash configure --with-debug-level=slowdebug --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu
 ```
 
 配置完成后，再次确认是否和教程中的配置信息一致：
@@ -488,7 +498,7 @@ configuration. You *should* run 'make clean' to make sure you get a
 proper build. Failure to do so might result in strange build problems.
 ```
 
-接着我们需要修改几个文件，不然一会会编译失败，首先是`hotspot/make/linux/Makefile`文件：
+接着我们需要修改几个文件，不然一会会编译失败，首先是`hotspot/make/lin	ux/Makefile`文件：
 
 ```
 原有的 SUPPORTED_OS_VERSION = 2.4% 2.5% 2.6% 3%
@@ -944,6 +954,7 @@ public class Main {
 
 ```sh
 javah -classpath out/production/SimpleHelloWorld -d ./jni com.test.Main
+javac -h . Main.java
 ```
 
 生成的头文件位于jni文件夹下：
@@ -1004,6 +1015,10 @@ JNIEXPORT jint JNICALL Java_com_test_Main_sum
 
 ```sh
 gcc com_test_Main.cpp -I /Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/include -I /Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/include/darwin -fPIC -shared -o test.dylib -lstdc++
+
+gcc main.cpp -I /usr/lib/jvm/java-17-openjdk-amd64/include -I /usr/lib/jvm/java-17-openjdk-amd64/include/linux -fPIC -shared -o test.so -lstdc++
+
+gcc main.cpp -I E:\Java\jdk-17\include -I E:\Java\jdk-17\include\win32 -fPIC -shared -o test.dll -lstdc++
 ```
 
 编译完成后，得到`test.dylib`文件，这就是动态链接库了。
