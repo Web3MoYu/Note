@@ -6,7 +6,7 @@
 
 ​	Apache Shiro是一个功能强大且易于使用的Java安全(权限)框架。Shiro可以完成：认证、授权、加密、会话管理、与Web集成、缓存等。借助Shiro您可以快速轻松地保护任何应用程序——从最小的移动应用程序到最大的Web和企业应用程序。
 
-![](软件开发/Java/尚硅谷/Shiro/img/1.png)
+![](img/1.png)
 
 官网：https://shiro.apache.org/
 
@@ -44,7 +44,7 @@
 
 **1、基本功能点如下图所示** 
 
-![](软件开发/Java/尚硅谷/Shiro/img/2.png)
+![](img/2.png)
 
 **2、功能简介**
 
@@ -74,7 +74,7 @@
 
 从外部来看Shiro，即从应用程序角度的来观察如何使用Shiro完成工作
 
-![](软件开发/Java/尚硅谷/Shiro/img/3.png)
+![](img/3.png)
 
 Shiro 架构
 
@@ -86,7 +86,7 @@ Shiro 架构
 
 **2、Shiro 架构(Shiro内部来看)**
 
-![](软件开发/Java/尚硅谷/Shiro/img/4.png)
+![](img/4.png)
 
 Shiro 架构
 
@@ -136,7 +136,7 @@ Shiro 获取权限相关信息可以通过数据库获取，也可以通过ini�
 
 **1、创建ini文件**
 
-![](软件开发/Java/尚硅谷/Shiro/img/5.png)
+![](img/5.png)
 
 ```
 [users]
@@ -164,7 +164,7 @@ lisi=l4
 
 （3）创建自定义的Realm类，继承org.apache.shiro.realm.AuthenticatingRealm类，实现doGetAuthenticationInfo()方法
 
-![](软件开发/Java/尚硅谷/Shiro/img/6.png)
+![](img/6.png)
 
 **3、登录认证实例** 
 
@@ -265,7 +265,7 @@ public void hello(){
 
 （4）Authorizer会判断Realm的角色/权限是否和传入的匹配，如果有多个Realm，会委托给ModularRealmAuthorizer进行循环判断，如果匹配如isPermitted*/hasRole*会返回true，否则返回false表示授权失败
 
-![](软件开发/Java/尚硅谷/Shiro/img/7.png)
+![](img/7.png)
 
 **4、授权实例**
 
@@ -413,7 +413,7 @@ role1=user:insert,user:select
 
 **1、创建模块**
 
-![](软件开发/Java/尚硅谷/Shiro/img/8.png)
+![](img/8.png)
 
 **2、添加依赖**
 
@@ -473,7 +473,7 @@ shiro:
 
 **4、添加启动类**
 
-![](软件开发/Java/尚硅谷/Shiro/img/9.png)
+![](img/9.png)
 
 ```java
 @SpringBootApplication
@@ -507,7 +507,7 @@ CREATE TABLE `user` (
 
 （2）创建实体
 
-![](软件开发/Java/尚硅谷/Shiro/img/10.png)
+![](img/10.png)
 
 ```java
 @Data
@@ -523,7 +523,7 @@ public class User {
 
 （3）创建mapper
 
-![](软件开发/Java/尚硅谷/Shiro/img/11.png)
+![](img/11.png)
 
 ```java
 @Mapper
@@ -536,7 +536,7 @@ public interface UserMapper extends BaseMapper<User>{
 
 ​	1、创建接口
 
-![](软件开发/Java/尚硅谷/Shiro/img/12.png)
+![](img/12.png)
 
 ```java
 public interface UserService {
@@ -547,7 +547,7 @@ public interface UserService {
 
 ​	2 创建实现类
 
-![](软件开发/Java/尚硅谷/Shiro/img/13.png)
+![](img/13.png)
 
 ```java
 @Service
@@ -566,7 +566,7 @@ public class UserServiceImpl implements UserService {
 
 （5）自定义realm
 
-![](软件开发/Java/尚硅谷/Shiro/img/14.png)
+![](img/14.png)
 
 ```java
 @Component
@@ -601,7 +601,7 @@ public class MyRealm extends AuthorizingRealm {
 
 （6）编写配置类
 
-![](软件开发/Java/尚硅谷/Shiro/img/15.png)
+![](img/15.png)
 
 ```java
 @Configuration
@@ -642,7 +642,7 @@ public class ShiroConfig {
 
 （7）实现controller
 
-![](软件开发/Java/尚硅谷/Shiro/img/16.png)
+![](img/16.png)
 
 ```java
 @Controller
@@ -672,7 +672,7 @@ public class MyController {
 
  确认数据库密码是加盐3次加密密码
 
-![](软件开发/Java/尚硅谷/Shiro/img/17.png)
+![](img/17.png)
 
 启动服务
 
@@ -680,7 +680,7 @@ public class MyController {
 
 http://localhost:8080/myController/userLogin?name=张三&pwd=z3
 
-![](软件开发/Java/尚硅谷/Shiro/img/18.png)
+![](img/18.png)
 
 **2、实现前端页面**
 
@@ -697,7 +697,7 @@ Shiro整合Thymeleaf
 
 （2）添加login页面
 
-![](软件开发/Java/尚硅谷/Shiro/img/19.png)
+![](img/19.png)
 
 ```html
 <!DOCTYPE html>
@@ -765,15 +765,15 @@ public String userLogin(String name, String pwd, HttpSession session){
 
 （5）修改配置文件
 
-![](软件开发/Java/尚硅谷/Shiro/img/20.png)
+![](img/20.png)
 
 （6）修改配置类
 
-![](软件开发/Java/尚硅谷/Shiro/img/21.png)
+![](img/21.png)
 
 （7）启动，访问测试
 
-![](软件开发/Java/尚硅谷/Shiro/img/22.png)
+![](img/22.png)
 
 ### 3.3 多个realm的认证策略设置
 
@@ -962,17 +962,17 @@ public String userLogin(HttpSession session) {
 
 ​	过滤器拦截跳回登录页面
 
-![](软件开发/Java/尚硅谷/Shiro/img/23.png)
+![](img/23.png)
 
 ​	（2）登录勾选记住用户
 
-![](软件开发/Java/尚硅谷/Shiro/img/24.png)
+![](img/24.png)
 
 ​	（3）重新访问userLoginRm
 
 ​		http://localhost:8080/myController/userLoginRm
 
-![](软件开发/Java/尚硅谷/Shiro/img/25.png)
+![](img/25.png)
 
 ### 3.5 用户登录认证后登出
 
@@ -1016,11 +1016,11 @@ public DefaultShiroFilterChainDefinition shiroFilterChainDefinition(){
 
 （1）通过登录验证
 
-![](软件开发/Java/尚硅谷/Shiro/img/26.png)
+![](img/26.png)
 
 （2）点击“登出”登出系统
 
-![](软件开发/Java/尚硅谷/Shiro/img/27.png)
+![](img/27.png)
 
 ### 3.6 授权、角色认证
 
@@ -1102,9 +1102,9 @@ protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principal
 
 （4）运行测试
 
-![](软件开发/Java/尚硅谷/Shiro/img/28.png)
+![](img/28.png)
 
-![](软件开发/Java/尚硅谷/Shiro/img/29.png)
+![](img/29.png)
 
 **3、授权验证-获取角色进行验证**
 
@@ -1126,7 +1126,7 @@ protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principal
 
 （2）运行测试
 
-![](软件开发/Java/尚硅谷/Shiro/img/30.png)
+![](img/30.png)
 
 （3）确认库表
 
@@ -1140,7 +1140,7 @@ CREATE TABLE `role` (
 ) ENGINE=INNODB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='角色表';
 ```
 
-![](软件开发/Java/尚硅谷/Shiro/img/31.png)
+![](img/31.png)
 
 ```mysql
 CREATE TABLE `role_user` (
@@ -1152,7 +1152,7 @@ CREATE TABLE `role_user` (
 表';
 ```
 
-![](软件开发/Java/尚硅谷/Shiro/img/32.png)
+![](img/32.png)
 
 （4）查询sql
 
@@ -1206,7 +1206,7 @@ protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principal
 
 （8）启动登录测试
 
-![](软件开发/Java/尚硅谷/Shiro/img/33.png)
+![](img/33.png)
 
 **4、授权验证-获取权限进行验证**
 
@@ -1224,7 +1224,7 @@ CREATE TABLE `permissions` (
 ) ENGINE=INNODB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='权限表';
 ```
 
-![](软件开发/Java/尚硅谷/Shiro/img/34.png)
+![](img/34.png)
 
 ```mysql
 CREATE TABLE `role_ps` (
@@ -1236,7 +1236,7 @@ CREATE TABLE `role_ps` (
 表';
 ```
 
-![](软件开发/Java/尚硅谷/Shiro/img/35.png)
+![](img/35.png)
 
 （2）查询sql
 
@@ -1332,13 +1332,13 @@ public String userLoginPermissions() {
 
 （8）启动登录测试
 
-![](软件开发/Java/尚硅谷/Shiro/img/36.png)
+![](img/36.png)
 
 **5、授权验证-异常处理**
 
 （1）创建认证异常处理类，使用@ControllerAdvice加@ExceptionHandler实现特殊异常处理。
 
-![](软件开发/Java/尚硅谷/Shiro/img/37.png)
+![](img/37.png)
 
 ```java
 @ControllerAdvice
@@ -1358,9 +1358,9 @@ public class PermissionsException {
 
 （2）启动运行，用李四登录测试。
 
-![](软件开发/Java/尚硅谷/Shiro/img/38.png)
+![](img/38.png)
 
-![](软件开发/Java/尚硅谷/Shiro/img/39.png)
+![](img/39.png)
 
 **6、前端页面授权验证**
 
@@ -1487,7 +1487,7 @@ public ShiroDialect shiroDialect(){
 
 （5）测试
 
-![](软件开发/Java/尚硅谷/Shiro/img/40.png)
+![](img/40.png)
 
 ### 3.7 实现缓存
 
@@ -1505,7 +1505,7 @@ public ShiroDialect shiroDialect(){
 
 （1）创建模块
 
-![](软件开发/Java/尚硅谷/Shiro/img/41.png)
+![](img/41.png)
 
 （2）添加依赖
 
@@ -1574,7 +1574,7 @@ public ShiroDialect shiroDialect(){
 
 （4）创建测试类，操作缓存
 
-![](软件开发/Java/尚硅谷/Shiro/img/43.png)
+![](img/43.png)
 
 ```java
 public class TestEH {
@@ -1688,13 +1688,13 @@ public EhCacheManager getEhCacheManager(){
 
 第一次登录可以看到查询角色、权限信息
 
-![](软件开发/Java/尚硅谷/Shiro/img/44.png)
+![](img/44.png)
 
-![](软件开发/Java/尚硅谷/Shiro/img/45.png)
+![](img/45.png)
 
 先清除日志，再点击角色认证、权限认证，查看日志，没有查询数据库
 
-![](软件开发/Java/尚硅谷/Shiro/img/46.png)
+![](img/46.png)
 
 #### SpringCache实现简易缓存
 
