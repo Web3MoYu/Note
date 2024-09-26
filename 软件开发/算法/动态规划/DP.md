@@ -559,3 +559,74 @@ public int solve(int[] arr, int aim){
 }
 ```
 
+## 最小路径和
+
+给定一个包含非负整数的 `*m* x *n*` 网格 `grid` ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。
+
+**说明：**每次只能向下或者向右移动一步。
+
+ 
+
+**示例 1：**
+
+![img](https://assets.leetcode.com/uploads/2020/11/05/minpath.jpg)
+
+```
+输入：grid = [[1,3,1],[1,5,1],[4,2,1]]
+输出：7
+解释：因为路径 1→3→1→1→1 的总和最小。
+```
+
+**示例 2：**
+
+```
+输入：grid = [[1,2,3],[4,5,6]]
+输出：12
+```
+
+**暴力递归**
+
+```java
+public int minPathSum(int[][] grid) {
+    return process(grid, 0, 0);
+}
+
+public int process(int[][] grid, int i, int j) {
+    if (i < 0 || i >= grid.length || j < 0 || j >= grid[0].length) {
+        return Integer.MAX_VALUE;
+    }
+    if (i == grid.length - 1 && j == grid[0].length - 1) {
+        return grid[i][j];
+    }
+    return Math.min(process(grid, i + 1, j), process(grid, i, j + 1)) + grid[i][j];
+}
+```
+
+**记忆化搜索**
+
+```java
+public int minPathSum(int[][] grid) {
+    int m = grid.length;
+    int n = grid[0].length;
+    int[][] dp = new int[m][n];
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            dp[i][j] = -1;
+        }
+    }
+    dp[m - 1][n - 1] = grid[m - 1][n - 1];
+    return process(grid, 0, 0, dp);
+}
+
+public int process(int[][] grid, int i, int j, int[][] dp) {
+    if (i < 0 || i >= grid.length || j < 0 || j >= grid[0].length) {
+        return Integer.MAX_VALUE;
+    }
+    if (dp[i][j] != -1) {
+        return dp[i][j];
+    }
+    dp[i][j] = Math.min(process(grid, i + 1, j, dp), process(grid, i, j + 1, dp)) + grid[i][j];
+    return dp[i][j];
+}
+```
+
