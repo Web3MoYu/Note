@@ -1,5 +1,55 @@
 # Docker
 
+## 安装Docker
+
+**1、更新 Ubuntu**
+
+打开终端，依次运行下列命令
+
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt full-upgrade
+```
+
+ **2、添加 Docker 库**
+
+首先，安装必要的证书并允许 apt 包管理器使用以下命令通过 HTTPS 使用存储库：
+
+```bash
+sudo apt install apt-transport-https ca-certificates curl software-properties-common gnupg lsb-release
+```
+
+然后，运行下列命令添加 Docker 的官方 GPG 密钥：
+
+```bash
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+```
+
+添加 Docker 官方库：
+
+```java
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+使用命令更新 Ubuntu 源列表：
+
+```bash
+sudo apt update
+```
+
+安装
+
+```bash
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+```Bash
+yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+## 4.启动和校验
+
 ## 将当前用户添加到docker组中
 
 ````shell
@@ -27,7 +77,9 @@ vim /etc/docker/daemon.json
 {
   "registry-mirrors": [
         "https://dockerhub.azk8s.cn",
-        "https://hub-mirror.c.163.com"
+        "https://hub-mirror.c.163.com",
+      	"https://registry.docker-cn.com",
+      	"https://s3d6l2fh.mirror.aliyuncs.com"
     ]
 }
 ```

@@ -3,13 +3,13 @@
 - 拉取mysql镜像
 
   ```bash
-  docker pull mysql:latest
+  docker pull mysql:8
   ```
 
 - 运行容器
 
   ```bash
-  docker run -d --hostname mysql --name mysql_01 -p 3306:3306 -v /home/lsh/mydata/mysql:/var/lib/mysql/ -e MYSQL_ROOT_PASSWORD=root mysql --lower_case_table_names=1
+  docker run -d --hostname mysql --name mysql -p 3306:3306 -v /root/docker/mysql/:/var/lib/mysql/ -e MYSQL_ROOT_PASSWORD=root mysql --lower_case_table_names=1
   ```
 
   ```
@@ -39,7 +39,8 @@ use mysql
 3、修改密码，设置所有主机可以访问
 
 ```bash
-ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '新密码'
+ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';
+ALTER USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'root'; 
 ```
 
 4、刷新权限
@@ -215,21 +216,23 @@ show pdbs;
   --log-opt max-size=100m \
   --log-opt max-file=2 \
   --name myredis \
+  --hostname redis \
   -v /home/lsh/mydata/redis/conf/redis.conf:/etc/redis/redis.conf \
   -v /home/lsh/mydata/redis/data:/data \
   -d redis:7.2 redis-server /etc/redis/redis.conf \
   --appendonly yes --requirepass 123456
   ```
-
+  
   ```bash
   docker run -p 6379:6379 \
   --name redis \
-  -v /home/lsh/mydata/redis/conf/redis.conf:/etc/redis/redis.conf \
+  --hostname redis \
+  -v /root/docker/redis/conf/redis.conf:/etc/redis/redis.conf \
   -v /home/lsh/mydata/redis/data:/data \
   -d redis:7.2 redis-server /etc/redis/redis.conf \
-  --appendonly yes redis:7.2
+  --appendonly yes
   ```
-
+  
   ```
   参数解释
   1.-restart=always 总是开机启动
