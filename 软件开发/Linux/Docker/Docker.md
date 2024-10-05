@@ -48,8 +48,6 @@ sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin dock
 yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-## 4.启动和校验
-
 ## 将当前用户添加到docker组中
 
 ````shell
@@ -57,57 +55,52 @@ sudo usermod -aG docker lsh # 添加组
 sudo systemctl restart docker # 重启docker服务
 ````
 
-### 配置仓库地址
+## 解决国内无法访问拉取镜像
 
-虽然每次安装docker之后都会进行修改仓库地址，但是每次修改之后都记不住在在哪里修改仓库地址，今天我还是来记录一下，省的以后找不到。
+**1.开启mirrord**
 
-步骤只有两步：1、修改配置文件。2、重启docker
+打开C:\Users\用户\.wslconfig文件，添加
 
-1、修改配置文件
-
-编辑配置文件，没有就创建一个
-
-```bash
-vim /etc/docker/daemon.json
+```
+[wsl2]
+networkingMode=mirrored
 ```
 
-文件内容如下：
+然后重启wsl
+
+**2.下载clash**
+
+使用[clash-verge](https://github.com/clash-verge-rev/clash-verge-rev)
+
+使用TurnMode模式
+
+**3.编辑dameon.json**
+
+ 使用命令 vim /etc/docker/daemon.json
 
 ```json
 {
-  "registry-mirrors": [
-        "https://dockerhub.azk8s.cn",
-        "https://hub-mirror.c.163.com",
-      	"https://registry.docker-cn.com",
-      	"https://s3d6l2fh.mirror.aliyuncs.com"
-    ]
+	"registry-mirrors": [
+   		"https://hub.docker.com/"
+    ],
+    "iptables":false
 }
 ```
 
-这里的仓库地址可以写多个
-
-2、重启docker
+重启docker
 
 ```bash
 systemctl daemon-reload
 systemctl restart docker
-systemctl status docker
 ```
 
-查看一下结果 
+**4.添加IP映射**
+
+在第三步之后如果使用docker search 命令不会超时的化不用执行
 
 ```bash
-docker info
+ip link set eth1 mtu 1500
 ```
-
-```bash
- Registry Mirrors:
-  https://dockerhub.azk8s.cn/
-  https://hub-mirror.c.163.com/
- Live Restore Enabled: false
-```
-
-
 
 ## （一）基础命令
 
