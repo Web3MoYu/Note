@@ -2,7 +2,7 @@
 
 ## 课程介绍
 
-![image-20211219121555979](image-20211219121555979.png)
+![image-20211219121555979](img\image-20211219121555979.png)
 
 ## 0. 简介
 
@@ -101,7 +101,7 @@ public class HelloController {
 
 ### 2.1 登陆校验流程
 
-![image-20211215094003288](image-20211215094003288.png)
+![image-20211215094003288](img\image-20211215094003288.png)
 
 ### 2.2 原理初探
 
@@ -113,7 +113,7 @@ public class HelloController {
 
 ​	SpringSecurity的原理其实就是一个过滤器链，内部包含了提供各种功能的过滤器。这里我们可以看看入门案例中的过滤器。
 
-![image-20211214144425527](image-20211214144425527.png)
+![image-20211214144425527](img\image-20211214144425527.png)
 
 ​	图中只展示了核心过滤器，其它的非核心过滤器并没有在图中展示。
 
@@ -127,7 +127,7 @@ public class HelloController {
 
 ​	我们可以通过Debug查看当前系统中SpringSecurity过滤器链中有哪些过滤器及它们的顺序。
 
-![image-20211214145824903](image-20211214145824903.png)
+![image-20211214145824903](img\image-20211214145824903.png)
 
 
 
@@ -135,7 +135,7 @@ public class HelloController {
 
 #### 2.2.2 认证流程详解
 
-![image-20211214151515385](image-20211214151515385.png)
+![image-20211214151515385](img\image-20211214151515385.png)
 
 概念速查:
 
@@ -1612,7 +1612,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 ​	RBAC权限模型（Role-Based Access Control）即：基于角色的权限控制。这是目前最常被开发者使用也是相对易用、通用权限模型。
 
-​	![image-20211222110249727](image-20211222110249727.png)
+​	![image-20211222110249727](img\image-20211222110249727.png)
 
 ##### 3.2.3.2 准备工作
 
@@ -2166,12 +2166,6 @@ public class SGExpressionRoot {
     }
 ~~~~
 
-
-
-
-
-
-
 ### CSRF
 
 ​	CSRF是指跨站请求伪造（Cross-site request forgery），是web常见的攻击之一。
@@ -2181,10 +2175,6 @@ public class SGExpressionRoot {
 ​	SpringSecurity去防止CSRF攻击的方式就是通过csrf_token。后端会生成一个csrf_token，前端发起请求的时候需要携带这个csrf_token,后端会有过滤器进行校验，如果没有携带或者是伪造的就不允许访问。
 
 ​	我们可以发现CSRF攻击依靠的是cookie中所携带的认证信息。但是在前后端分离的项目中我们的认证信息其实是token，而token并不是存储中cookie中，并且需要前端代码去把token设置到请求头中才可以，所以CSRF攻击也就不用担心了。
-
-
-
-
 
 ### 认证成功处理器
 
@@ -2312,11 +2302,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
 
-
-
 ### 其他认证方案畅想
-
-
 
 
 
